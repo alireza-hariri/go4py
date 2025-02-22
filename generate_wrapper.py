@@ -6,9 +6,61 @@ module_name = "go_cool"
 
 
 class IntType(BaseModel):
-    name = "int"
     bits: int = 64
     unsigned: bool = False
+
+    def fmt_str(self) -> str:
+        """Returns the format string for the given integer type."""
+        if self.bits == 8:
+            return "b" if not self.unsigned else "B"
+        elif self.bits == 16:
+            return "h" if not self.unsigned else "H"
+        elif self.bits == 32:
+            return "i" if not self.unsigned else "I"
+        elif self.bits == 64:
+            return "l" if not self.unsigned else "L"
+        else:
+            raise ValueError(f"Unsupported bit size: {self.bits}")
+
+    def c_var(self):
+        if self.bits == 8:
+            if self.unsigned:
+                return "unsigned char"
+            else:
+                return "char"
+        elif self.bits == 16:
+            if self.unsigned:
+                return "unsigned short"
+            else:
+                return "short"
+        elif self.bits == 32:
+            if self.unsigned:
+                return "unsigned int"
+            else:
+                return "int"
+        elif self.bits == 64:
+            if self.unsigned:
+                return "unsigned long"
+            else:
+                return "long"
+        else:
+            raise ValueError(f"Unsupported bit size: {self.bits}")
+
+
+go_types_dict = {
+    # here we assume 64-bit system
+    "int": IntType(bits=64, unsigned=False),
+    "int8": IntType(bits=8, unsigned=False),
+    "int16": IntType(bits=16, unsigned=False),
+    "int32": IntType(bits=32, unsigned=False),
+    "int64": IntType(bits=64, unsigned=False),
+    "uint": IntType(bits=64, unsigned=True),
+    "uint8": IntType(bits=8, unsigned=True),
+    "uint16": IntType(bits=16, unsigned=True),
+    "uint32": IntType(bits=32, unsigned=True),
+    "uint64": IntType(bits=64, unsigned=True),
+    "uintptr": None,
+}
 
 
 VarType: TypeAlias = IntType | None
@@ -48,11 +100,17 @@ static PyObject* go_cool_add(PyObject* self, PyObject* args) {
 class ArgumentParser:
     format_string = ""
     arg_decl = ""
+    arg_list = ""
 
     def addArg(self, var: Variable):
-        match var.type:
-            case IntType():
-                self.format_string += "i"
-                self.arg_decl += f"int {var.name};"
-            case _:
-                raise NotImplementedError(f"type {var.type.name} is not implemented")
+        self.arg_decl += f"{var.type.c_var()} {var.name};\n"
+        self.format_string += var.type.fmt_str()
+        self.arg_list += f"&{var.name}, "
+
+    def gen_ParseTuple(self):
+        return f"""
+        {self.arg_decl}
+        
+        if (!PyArg_ParseTuple(args, "{self.format_string}", {self.arg_list[:-2]}))
+            return NULL;
+        """
