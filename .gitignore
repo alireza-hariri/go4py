@@ -1,2 +1,4 @@
 **.so
-build/libgo_cool.h
+build/*
+__pycache__
+

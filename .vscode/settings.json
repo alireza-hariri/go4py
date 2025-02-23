@@ -1,0 +1,7 @@
+{
+    "files.associations": {
+        "Dockerfile": "dockerfile",
+        "libgo_cool.h": "c",
+        "python.h": "c"
+    }
+}

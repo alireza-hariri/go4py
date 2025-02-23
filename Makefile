@@ -14,4 +14,7 @@ generate-wrapper: go-build
 
 
 c-build: go-build
-	gcc -shared -o ${MODULE_NAME}.so -fPIC wrapper/${MODULE_NAME}.c -L./build -l${MODULE_NAME} -I/${PYTHON_INCLUDE}
+	gcc -shared -o ${MODULE_NAME}.so -fPIC wrapper/${MODULE_NAME}.c -L./build -l${MODULE_NAME} -I${PYTHON_INCLUDE}
+
+clean:
+	rm -rf ./build/* ./*.so 

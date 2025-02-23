@@ -3,24 +3,43 @@ package main
 import "C"
 
 import (
+	"math/rand"
+	"strings"
 	"sync"
+	// "fmt"
 )
 
 var count int
 var mtx sync.Mutex
 
-// kmkk
+const letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+
+
+
 //export Add
 func Add(a, b int) int {
-        return a + b
+    return a + b
 }
 
 
-// jjjjjjj
-//export somethingelse
-func somethingelse(a, b int) (int,[]string) {
-        return a + b, []string{"a","b"}
+//export Replace
+func Replace(s string, old string, new string ) *C.char {
+    // fmt.Println(s)
+    res:= strings.Replace(s, old, new, -1)
+    return C.CString(res)
+    // return "alaki"
 }
+
+
+//export RandomString
+func RandomString(n int) *C.char  {
+    res := make([]byte, n)
+    for i := range res {
+        res[i] = letterBytes[rand.Intn(len(letterBytes))]
+    }
+    return C.CString(string(res))
+}
+
 
 // ggygygyg
 func main() {
