@@ -69,6 +69,9 @@ class BoolType(BaseModel):
     def fmt_str(self) -> str:
         return "d"
 
+    def converter(self) -> str:
+        return "PyBool_FromLong"
+
 
 class StringType(BaseModel):
     need_copy: ClassVar[bool] = True
@@ -78,6 +81,9 @@ class StringType(BaseModel):
 
     def fmt_str(self) -> str:
         return "s"
+
+    def converter(self) -> str:
+        return "PyUnicode_FromString"
 
 
 VarType: TypeAlias = IntType | FloatType | BoolType | StringType

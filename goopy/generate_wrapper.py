@@ -105,7 +105,7 @@ class ArgumentParser:
     def gen_ParseTuple(self):
         args = "\n".join(self.arg_decl)
         return f"""{args}
-    if (!PyArg_ParseTuple(args, "{self.format_string}", {self.arg_list}))
+    if (!PyArg_ParseTuple(args, "{self.format_string}", {", ".join(self.arg_list)}))
         return NULL;"""
 
     def gen_checks(self):
@@ -161,12 +161,23 @@ static PyObject* go_cool_{fn.name}(PyObject* self, PyObject* args) {{
 """
 
 
-fn = GoFunction(
-    name="myFunc",
-    return_type=IntType(),
-    arguments=[
-        Variable(name="a", type=IntType()),
-        Variable(name="s", type=StringType()),
-    ],
-)
-print(gen_fn(fn))
+if __name__ == "__main__":
+    import pyperclip
+
+    fn = GoFunction(
+        name="MyFunc",
+        return_type=StringType(),
+        arguments=[
+            Variable(name="a", type=IntType()),
+            Variable(name="s", type=StringType()),
+        ],
+    )
+
+    code = gen_fn(fn)
+    pyperclip.copy(code)
+    print(code)
+
+
+"""
+uv run -m goopy.generate_wrapper
+"""

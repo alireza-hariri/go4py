@@ -47,22 +47,27 @@ static PyObject* go_cool_random_string(PyObject* self, PyObject* args) {
 
 
 
-static PyObject* go_cool_myFunc(PyObject* self, PyObject* args) {
+
+static PyObject* go_cool_MyFunc(PyObject* self, PyObject* args) {
     long a;
     char* s;
     if (!PyArg_ParseTuple(args, "ls", &a, &s))
         return NULL;
     GoString go_s = {s, (GoInt)strlen(s)};
-    long result = myFunc(a,go_s);
-    PyObject* py_result = PyLong_FromLong(result);
+    char* result = MyFunc(a,go_s);
+    PyObject* py_result = PyUnicode_FromString(result);
+    free(result);
+    
     return py_result;
 }
+
 
 
 static PyMethodDef GoCoolMethods[] = {
     {"add", go_cool_add, METH_VARARGS, "Add two numbers"},
     {"replace", go_cool_replace, METH_VARARGS, "Replace"},
     {"random_string", go_cool_random_string, METH_VARARGS, "RandomString"},
+    {"myFunc", go_cool_MyFunc, METH_VARARGS, "myFunc"},
     {NULL, NULL, 0, NULL}
 };
 static struct PyModuleDef go_cool_module = {

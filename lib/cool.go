@@ -40,6 +40,11 @@ func RandomString(n int) *C.char  {
     return C.CString(string(res))
 }
 
+//export MyFunc
+func MyFunc(a int, b string) *C.char {
+    // fmt.Println(a)
+    return C.CString(b)
+}
 
 // ggygygyg
 func main() {
