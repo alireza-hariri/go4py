@@ -5,15 +5,17 @@ ipython
 ```
 
 ```python
-from go_cool import myFunc, random_string, replace
+from go_cool import fff, random_string, replace, f2str, str2f, map_test
 import random
 import string
 
 %%timeit
+str2f("12.3456789")
+f2str(12.3456789)
 go_cool.random_string(1_000).replace("a","b")
 "".join(random.choices(string.ascii_lowercase, k=1_000)).replace("a","b")
 
-%timeit myFunc(199,"12"*1_000_000)
+myFunc(199,"12"*1_000_000)
 ```
 
 

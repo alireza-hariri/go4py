@@ -7,10 +7,10 @@ class IntType(BaseModel):
     unsigned: bool = False
     need_copy: ClassVar[bool] = False
 
-    def converter(self):
+    def converter(self, inp):
         # PyLong_FromLong
         # TODO: fix this for other ints
-        return "PyLong_FromLong"
+        return f"PyLong_FromLong({inp})"
 
     def fmt_str(self) -> str:
         """Returns the format string for the given integer type."""
@@ -59,6 +59,14 @@ class FloatType(BaseModel):
         else:
             raise ValueError(f"Unsupported bit size: {self.bits}")
 
+    def converter(self, inp) -> str:
+        if self.bits == 32:
+            return f"PyFloat_FromFloat({inp})"
+        elif self.bits == 64:
+            return f"PyFloat_FromDouble({inp})"
+        else:
+            raise ValueError(f"Unsupported bit size: {self.bits}")
+
 
 class BoolType(BaseModel):
     need_copy: ClassVar[bool] = False
@@ -69,8 +77,8 @@ class BoolType(BaseModel):
     def fmt_str(self) -> str:
         return "d"
 
-    def converter(self) -> str:
-        return "PyBool_FromLong"
+    def converter(self, inp) -> str:
+        return f"PyBool_FromLong({inp})"
 
 
 class StringType(BaseModel):
@@ -82,8 +90,8 @@ class StringType(BaseModel):
     def fmt_str(self) -> str:
         return "s"
 
-    def converter(self) -> str:
-        return "PyUnicode_FromString"
+    def converter(self, inp) -> str:
+        return f"PyUnicode_FromString({inp})"
 
 
 VarType: TypeAlias = IntType | FloatType | BoolType | StringType

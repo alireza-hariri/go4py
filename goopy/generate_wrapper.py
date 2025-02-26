@@ -4,11 +4,11 @@ from goopy.types import BoolType, FloatType, GoFunction, IntType, StringType, Va
 
 go_types_dict = {
     # here we assume 64-bit system
-    "int": IntType(bits=64, unsigned=False),
-    "int8": IntType(bits=8, unsigned=False),
-    "int16": IntType(bits=16, unsigned=False),
-    "int32": IntType(bits=32, unsigned=False),
-    "int64": IntType(bits=64, unsigned=False),
+    "int": IntType(bits=64),
+    "int8": IntType(bits=8),
+    "int16": IntType(bits=16),
+    "int32": IntType(bits=32),
+    "int64": IntType(bits=64),
     "uint": IntType(bits=64, unsigned=True),
     "uint8": IntType(bits=8, unsigned=True),
     "uint16": IntType(bits=16, unsigned=True),
@@ -103,6 +103,8 @@ class ArgumentParser:
         self.arg_list.append("&" + var.name)
 
     def gen_ParseTuple(self):
+        if len(self.arg_decl) == 0:
+            return ""
         args = "\n".join(self.arg_decl)
         return f"""{args}
     if (!PyArg_ParseTuple(args, "{self.format_string}", {", ".join(self.arg_list)}))
@@ -131,18 +133,19 @@ class ReturnConverter:
         self.t = t
 
     def gen_py_result(self):
-        return f"    PyObject* py_result = {self.t.converter()}(result);"
+        return f"    PyObject* py_result = {self.t.converter('result')};"
 
     def gen_copys(self):
         return ""
 
     def gen_free_and_refdec(self):
-        return ""
+        return "\n    free(result);"
 
     def gen_code(self):
         result = self.gen_py_result()
-        result += self.gen_copys()
-        result += self.gen_free_and_refdec()
+        if self.t.need_copy:
+            result += self.gen_copys()
+            result += self.gen_free_and_refdec()
         return result
 
 
@@ -165,11 +168,11 @@ if __name__ == "__main__":
     import pyperclip
 
     fn = GoFunction(
-        name="MyFunc",
+        name="Map_test",
         return_type=StringType(),
         arguments=[
-            Variable(name="a", type=IntType()),
-            Variable(name="s", type=StringType()),
+            # Variable(name="a", type=FloatType()),
+            # Variable(name="s", type=StringType()),
         ],
     )
 
