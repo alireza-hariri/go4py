@@ -28,14 +28,6 @@ go_types_dict = {
 module_name = "go_cool"
 
 """
-static PyObject* go_cool_add(PyObject* self, PyObject* args) {
-    int a, b;
-    if (!PyArg_ParseTuple(args, "ii", &a, &b))
-        return NULL;
-    int result = (int)Add((GoInt)a, (GoInt)b);
-    return PyLong_FromLong(result);
-}
-
 static PyObject* pygoo_sort(PyObject* self, PyObject* args) {
     PyObject* list;
     
@@ -72,19 +64,6 @@ static PyObject* pygoo_sort(PyObject* self, PyObject* args) {
     // return result_list;
     return Py_None;
 }
-
-
-static PyObject* pygoo_transform(PyObject* self, PyObject* args) {
-    const char* input;
-    if (!PyArg_ParseTuple(args, "s", &input))
-        return NULL;
-    GoString str = {input, (GoInt)strlen(input)};
-    char* result = Transform(str);
-    PyObject* py_result = PyUnicode_FromString(result);
-    free(result); 
-    return py_result;
-}
-
 """
 
 
@@ -172,7 +151,7 @@ if __name__ == "__main__":
         return_type=StringType(),
         arguments=[
             # Variable(name="a", type=FloatType()),
-            # Variable(name="s", type=StringType()),
+            Variable(name="s", type=StringType()),
         ],
     )
 
@@ -180,7 +159,11 @@ if __name__ == "__main__":
     pyperclip.copy(code)
     print(code)
 
+    jj = fn.model_dump_json()
 
+    fn2 = GoFunction.model_validate_json(jj)
+
+    assert fn == fn2
 """
 uv run -m goopy.generate_wrapper
 """

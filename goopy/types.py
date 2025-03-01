@@ -1,16 +1,41 @@
 from pydantic import BaseModel
-from typing import ClassVar, TypeAlias
+from typing import ClassVar, Literal, TypeAlias
+
+from abc import ABC, abstractmethod
 
 
-class IntType(BaseModel):
+class VarType(BaseModel, ABC):
+    t: str
+    need_copy: ClassVar[bool]
+
+    @abstractmethod
+    def c_type(self) -> str: ...
+
+    @abstractmethod
+    def fmt_str(self) -> str: ...
+
+    @abstractmethod
+    def converter(self, inp: str): ...
+
+
+class IntType(VarType):
+    t: Literal["int"] = "int"
     bits: int = 64
     unsigned: bool = False
     need_copy: ClassVar[bool] = False
 
-    def converter(self, inp):
-        # PyLong_FromLong
-        # TODO: fix this for other ints
-        return f"PyLong_FromLong({inp})"
+    def c_type(self) -> str:
+        _sign = "" if not self.unsigned else "unsigned "
+        if self.bits == 8:
+            return _sign + "char"
+        elif self.bits == 16:
+            return _sign + "short"
+        elif self.bits == 32:
+            return _sign + "int"
+        elif self.bits == 64:
+            return _sign + "long"
+        else:
+            raise ValueError(f"Unsupported bit size: {self.bits}")
 
     def fmt_str(self) -> str:
         """Returns the format string for the given integer type."""
@@ -25,21 +50,14 @@ class IntType(BaseModel):
         else:
             raise ValueError(f"Unsupported bit size: {self.bits}")
 
-    def c_type(self):
-        _sign = "" if not self.unsigned else "unsigned "
-        if self.bits == 8:
-            return _sign + "char"
-        elif self.bits == 16:
-            return _sign + "short"
-        elif self.bits == 32:
-            return _sign + "int"
-        elif self.bits == 64:
-            return _sign + "long"
-        else:
-            raise ValueError(f"Unsupported bit size: {self.bits}")
+    def converter(self, inp):
+        # PyLong_FromLong
+        # TODO: fix this for other ints
+        return f"PyLong_FromLong({inp})"
 
 
-class FloatType(BaseModel):
+class FloatType(VarType):
+    t: Literal["float"] = "float"
     bits: int = 64
     need_copy: ClassVar[bool] = False
 
@@ -59,7 +77,7 @@ class FloatType(BaseModel):
         else:
             raise ValueError(f"Unsupported bit size: {self.bits}")
 
-    def converter(self, inp) -> str:
+    def converter(self, inp):
         if self.bits == 32:
             return f"PyFloat_FromFloat({inp})"
         elif self.bits == 64:
@@ -68,7 +86,8 @@ class FloatType(BaseModel):
             raise ValueError(f"Unsupported bit size: {self.bits}")
 
 
-class BoolType(BaseModel):
+class BoolType(VarType):
+    t: Literal["bool"] = "bool"
     need_copy: ClassVar[bool] = False
 
     def c_type(self) -> str:
@@ -77,11 +96,12 @@ class BoolType(BaseModel):
     def fmt_str(self) -> str:
         return "d"
 
-    def converter(self, inp) -> str:
+    def converter(self, inp):
         return f"PyBool_FromLong({inp})"
 
 
-class StringType(BaseModel):
+class StringType(VarType):
+    t: Literal["string"] = "string"
     need_copy: ClassVar[bool] = True
 
     def c_type(self) -> str:
@@ -90,19 +110,34 @@ class StringType(BaseModel):
     def fmt_str(self) -> str:
         return "s"
 
-    def converter(self, inp) -> str:
+    def converter(self, inp):
         return f"PyUnicode_FromString({inp})"
 
 
-VarType: TypeAlias = IntType | FloatType | BoolType | StringType
+class SliceType(VarType):
+    t: Literal["slice"] = "slice"
+    need_copy: ClassVar[bool] = True
+
+    def c_type(self) -> str:
+        return "PyObject*"
+
+    def fmt_str(self) -> str:
+        return "O"
+
+    def converter(self, inp):
+        return f"PyList_New({inp})"
+
+
+RealType: TypeAlias = IntType | FloatType | BoolType | StringType
 
 
 class Variable(BaseModel):
     name: str | None
-    type: VarType
+    type: RealType
 
 
 class GoFunction(BaseModel):
     name: str
-    return_type: VarType
+    docs: str | None
+    return_type: RealType
     arguments: list[Variable]
