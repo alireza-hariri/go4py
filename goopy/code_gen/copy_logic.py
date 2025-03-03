@@ -1,4 +1,4 @@
-from goopy.types import StringType, Variable
+from goopy.types import GoStringType, Variable
 
 
 def gen_go_copy(v: Variable):
@@ -8,7 +8,7 @@ def gen_go_copy(v: Variable):
 
     """
     match v.type:
-        case StringType():
+        case GoStringType():
             return f"""
     GoString go_{v.name} = {{{v.name}, (GoInt)strlen({v.name})}};"""
         case _:

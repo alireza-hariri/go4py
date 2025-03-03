@@ -2,10 +2,41 @@ from pydantic import BaseModel
 from typing import ClassVar, Literal, TypeAlias
 
 from abc import ABC, abstractmethod
+import logging
+
+logger = logging.getLogger(__name__)
+
+
+# cusotom exception: cgo limitation
+class CgoLimitationError(Exception):
+    pass
+
+
+# go_types_dict = {
+#     # here we assume 64-bit system
+#     "int": IntType(bits=64),
+#     "int8": IntType(bits=8),
+#     "int16": IntType(bits=16),
+#     "int32": IntType(bits=32),
+#     "int64": IntType(bits=64),
+#     "uint": IntType(bits=64, unsigned=True),
+#     "uint8": IntType(bits=8, unsigned=True),
+#     "uint16": IntType(bits=16, unsigned=True),
+#     "uint32": IntType(bits=32, unsigned=True),
+#     "uint64": IntType(bits=64, unsigned=True),
+#     "byte": IntType(bits=8, unsigned=True),
+#     "rune": IntType(bits=32),
+#     "float32": FloatType(bits=32),
+#     "float64": FloatType(bits=64),
+#     "bool": BoolType(),
+#     "string": StringType(),
+#     # "error": ErrorType(),
+#     # uintptr": None,
+# }
 
 
 class VarType(BaseModel, ABC):
-    t: str
+    go_type: str
     need_copy: ClassVar[bool]
 
     @abstractmethod
@@ -19,7 +50,7 @@ class VarType(BaseModel, ABC):
 
 
 class IntType(VarType):
-    t: Literal["int"] = "int"
+    go_type: Literal["int"] = "int"
     bits: int = 64
     unsigned: bool = False
     need_copy: ClassVar[bool] = False
@@ -57,7 +88,7 @@ class IntType(VarType):
 
 
 class FloatType(VarType):
-    t: Literal["float"] = "float"
+    go_type: Literal["float64", "float32"] = "float"
     bits: int = 64
     need_copy: ClassVar[bool] = False
 
@@ -87,7 +118,7 @@ class FloatType(VarType):
 
 
 class BoolType(VarType):
-    t: Literal["bool"] = "bool"
+    go_type: Literal["bool"] = "bool"
     need_copy: ClassVar[bool] = False
 
     def c_type(self) -> str:
@@ -100,8 +131,8 @@ class BoolType(VarType):
         return f"PyBool_FromLong({inp})"
 
 
-class StringType(VarType):
-    t: Literal["string"] = "string"
+class CStringType(VarType):
+    go_type: Literal["*C.char"] = "*C.char"
     need_copy: ClassVar[bool] = True
 
     def c_type(self) -> str:
@@ -114,21 +145,71 @@ class StringType(VarType):
         return f"PyUnicode_FromString({inp})"
 
 
-class SliceType(VarType):
-    t: Literal["slice"] = "slice"
+class GoStringType(VarType):
+    go_type: Literal["string"] = "string"
     need_copy: ClassVar[bool] = True
 
     def c_type(self) -> str:
-        return "PyObject*"
+        return "char*"
 
     def fmt_str(self) -> str:
-        return "O"
+        return "s"
 
     def converter(self, inp):
-        return f"PyList_New({inp})"
+        raise CgoLimitationError("don't return string from cgo")
 
 
-RealType: TypeAlias = IntType | FloatType | BoolType | StringType
+class BytesType(VarType):
+    go_type: Literal["unsafe.Pointer"] = "unsafe.Pointer"
+    need_copy: ClassVar[bool] = True
+    size: str | None = None
+
+    def c_type(self) -> str:
+        return "void*"
+
+    def fmt_str(self) -> str:
+        raise NotImplementedError()
+
+    def converter(self, inp):
+        if self.size is None:
+            logger.warning(
+                "Converting cgo unsafe.Pointer to python bytes without knowing its size!! "
+                "(may get trucated on the first zero byte)"
+            )
+            return f"PyBytes_FromString((char*){inp})"
+        else:
+            return NotImplementedError()
+
+
+class NoneType(VarType):
+    go_type: Literal[""] = ""
+    need_copy: ClassVar[bool] = False
+
+    def c_type(self) -> str:
+        return ""
+
+    def fmt_str(self) -> str:
+        raise NotImplementedError()
+
+    def converter(self, inp):
+        return "Py_None"
+
+
+# class SliceType(VarType):
+#     go_type: Literal["slice"] = "slice"
+#     need_copy: ClassVar[bool] = True
+
+#     def c_type(self) -> str:
+#         return "PyObject*"
+
+#     def fmt_str(self) -> str:
+#         return "O"
+
+#     def converter(self, inp):
+#         return f"PyList_New({inp})"
+
+
+RealType: TypeAlias = IntType | FloatType | BoolType | GoStringType | CStringType | BytesType
 
 
 class Variable(BaseModel):
@@ -137,7 +218,15 @@ class Variable(BaseModel):
 
 
 class GoFunction(BaseModel):
+    package: str
     name: str
     docs: str | None
-    return_type: RealType
     arguments: list[Variable]
+    return_type: list[RealType]
+
+    def model_post_init(self, __context):
+        if self.return_type is None:
+            self.return_type = NoneType()
+
+    def __str__(self) -> str:
+        return f"{self.package}.{self.name}"
