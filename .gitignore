@@ -3,3 +3,5 @@ build/*
 __pycache__
 
 functions.json
+artifacts/parsing
+artifacts/build

@@ -57,6 +57,7 @@ func readNodeText(content string, fset *token.FileSet, n ast.Node) (string, erro
 func getFileContent(n string) (string, error) {
 	data, err := os.ReadFile(n)
 	if err != nil {
+		logrus.Errorf("Error reading file: %v", err)
 		return "", err
 	}
 	return string(data), nil
@@ -71,9 +72,12 @@ func main() {
 	if len(os.Args) > 1 {
 		dirPath = os.Args[1]
 	}
+	if len(os.Args) > 2 && os.Args[2] == "--debug" {
+		logrus.SetLevel(logrus.DebugLevel)
+	}
 	d, err := parser.ParseDir(fset, dirPath, nil, parser.ParseComments)
 	if err != nil {
-		logrus.Debugf("%v", err)
+		logrus.Errorf("%v", err)
 		return
 	}
 	for k, pkg := range d {
@@ -197,7 +201,7 @@ func main() {
 	}
 
 	// Save the JSON to a file
-	err = os.WriteFile("functions.json", jsonData, 0644)
+	err = os.WriteFile("artifacts/functions.json", jsonData, 0644)
 	if err != nil {
 		logrus.Errorf("Error writing JSON to file: %v", err)
 		return

@@ -1,6 +1,6 @@
 from pathlib import Path
 from goopy.code_gen.generate_wrapper import gen_fn
-from goopy.types import CgoLimitationError
+from goopy.types import CgoLimitationError, GoFunction
 
 
 def template(module: str, functions_code: list, methods: str):
@@ -8,13 +8,12 @@ def template(module: str, functions_code: list, methods: str):
 #define PY_SSIZE_T_CLEAN
 
 #include <Python.h>
-#include "../build/lib{module}.h"
+#include "../artifacts/build/lib{module}.h"
 #include <string.h>
 
 {functions_code}
 
-static PyMethodDef Methods[] = {{
-    {methods}
+static PyMethodDef Methods[] = {{{methods}
     {{NULL, NULL, 0, NULL}}
 }};
 
@@ -31,7 +30,7 @@ PyMODINIT_FUNC PyInit_{module}(void) {{
 """
 
 
-def gen_binding_file(module: str, functions, dest: Path | str):
+def gen_binding_file(module: str, functions: list[GoFunction], dest: Path | str):
     functions_code = ""
     res_functions = []
     for fn in functions:
@@ -44,6 +43,7 @@ def gen_binding_file(module: str, functions, dest: Path | str):
 
     methods = ""
     for fn in res_functions:
-        methods += f'{{"{fn.name}", {module}_{fn.name}, METH_VARARGS, "{fn.name}"}},'
+        fn_name = fn.lowercase_name()
+        methods += f'\n    {{"{fn_name}", {module}_{fn_name}, METH_VARARGS, "{fn_name}"}},'
     with open(dest, "w") as f:
         f.write(template(module, functions_code, methods))

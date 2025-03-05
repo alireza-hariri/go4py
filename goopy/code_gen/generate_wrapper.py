@@ -103,7 +103,7 @@ def gen_fn(fn: GoFunction, module_name: str):
         return_code = "".join(c.gen_code() for c in return_converters)
         return_code += "\n    return py_result;"
     return f"""
-static PyObject* {module_name}_{fn.name}(PyObject* self, PyObject* args) {{
+static PyObject* {module_name}_{fn.lowercase_name()}(PyObject* self, PyObject* args) {{
 {arg_parser.gen_code()}
 {gen_fn_call(fn)}
 {return_code}

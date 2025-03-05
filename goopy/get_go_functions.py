@@ -9,28 +9,18 @@ from goopy.types import GoFunction
 logger = logging.getLogger(__name__)
 
 
-def get_go_functions():
+def get_go_functions(module_folder: str):
+    """list all go exported functions in the go module"""
     # Get the project root directory
-    project_root = Path(__file__).parent.parent
-
-    # Path to the parser executable
-    parser_path = project_root / "build" / "parsing"
-
-    # Run the parser executable
-    logger.debug(f"Running parser: {parser_path}")
-    result = subprocess.run([parser_path], cwd=project_root, check=True)
-
-    if result.returncode != 0:
-        logger.error(f"Parser failed with exit code {result.returncode}")
-        return
+    project_root = Path(__file__).parent.parent / module_folder
 
     # Path to the generated functions.json file
-    functions_json_path = project_root / "functions.json"
+    functions_json_path = project_root / "artifacts/functions.json"
 
     # Check if the functions.json file was generated
     if not functions_json_path.exists():
         logger.error(f"Error: {functions_json_path} was not generated")
-        return
+        raise FileNotFoundError(f"{functions_json_path} was not generated")
 
     # Read the functions.json file
     logger.debug(f"Reading functions from: {functions_json_path.name}")
