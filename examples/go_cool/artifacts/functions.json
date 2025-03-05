@@ -1,0 +1,267 @@
+[
+  {
+    "package": "main",
+    "name": "Transform",
+    "docs": "",
+    "arguments": [
+      {
+        "name": "s",
+        "type": {
+          "go_type": "string"
+        }
+      }
+    ],
+    "return_type": [
+      {
+        "go_type": "*C.char"
+      }
+    ]
+  },
+  {
+    "package": "main",
+    "name": "Add",
+    "docs": "",
+    "arguments": [
+      {
+        "name": "a",
+        "type": {
+          "go_type": "int"
+        }
+      },
+      {
+        "name": "b",
+        "type": {
+          "go_type": "int"
+        }
+      }
+    ],
+    "return_type": [
+      {
+        "go_type": "int"
+      }
+    ]
+  },
+  {
+    "package": "main",
+    "name": "Replace",
+    "docs": "",
+    "arguments": [
+      {
+        "name": "s",
+        "type": {
+          "go_type": "string"
+        }
+      },
+      {
+        "name": "old",
+        "type": {
+          "go_type": "string"
+        }
+      },
+      {
+        "name": "new",
+        "type": {
+          "go_type": "string"
+        }
+      }
+    ],
+    "return_type": [
+      {
+        "go_type": "*C.char"
+      }
+    ]
+  },
+  {
+    "package": "main",
+    "name": "RandomString",
+    "docs": "",
+    "arguments": [
+      {
+        "name": "n",
+        "type": {
+          "go_type": "int"
+        }
+      }
+    ],
+    "return_type": [
+      {
+        "go_type": "*C.char"
+      }
+    ]
+  },
+  {
+    "package": "main",
+    "name": "MyFunc",
+    "docs": "",
+    "arguments": [
+      {
+        "name": "a",
+        "type": {
+          "go_type": "int"
+        }
+      },
+      {
+        "name": "b",
+        "type": {
+          "go_type": "string"
+        }
+      }
+    ],
+    "return_type": [
+      {
+        "go_type": "[](int)"
+      }
+    ]
+  },
+  {
+    "package": "main",
+    "name": "Cosine",
+    "docs": "",
+    "arguments": [
+      {
+        "name": "x",
+        "type": {
+          "go_type": "float64"
+        }
+      }
+    ],
+    "return_type": [
+      {
+        "go_type": "float64"
+      }
+    ]
+  },
+  {
+    "package": "main",
+    "name": "F2str",
+    "docs": "",
+    "arguments": [
+      {
+        "name": "x",
+        "type": {
+          "go_type": "float64"
+        }
+      }
+    ],
+    "return_type": [
+      {
+        "go_type": "string"
+      }
+    ]
+  },
+  {
+    "package": "main",
+    "name": "F2str2",
+    "docs": "",
+    "arguments": [
+      {
+        "name": "x",
+        "type": {
+          "go_type": "float64"
+        }
+      }
+    ],
+    "return_type": [
+      {
+        "go_type": "*C.char"
+      }
+    ]
+  },
+  {
+    "package": "main",
+    "name": "Str2f",
+    "docs": "",
+    "arguments": [
+      {
+        "name": "s",
+        "type": {
+          "go_type": "string"
+        }
+      }
+    ],
+    "return_type": [
+      {
+        "go_type": "float64"
+      }
+    ]
+  },
+  {
+    "package": "main",
+    "name": "Fff",
+    "docs": "",
+    "arguments": [],
+    "return_type": [
+      {
+        "go_type": "[]*C.char"
+      }
+    ]
+  },
+  {
+    "package": "main",
+    "name": "Map_test",
+    "docs": "",
+    "arguments": [],
+    "return_type": [
+      {
+        "go_type": "[]C.SS_KVPair"
+      }
+    ]
+  },
+  {
+    "package": "main",
+    "name": "Slice_inp_test",
+    "docs": "",
+    "arguments": [
+      {
+        "name": "nums",
+        "type": {
+          "go_type": "[]int"
+        }
+      }
+    ],
+    "return_type": []
+  },
+  {
+    "package": "main",
+    "name": "Tesing",
+    "docs": "",
+    "arguments": [
+      {
+        "name": "native_map",
+        "type": {
+          "go_type": "map[string]string"
+        }
+      }
+    ],
+    "return_type": [
+      {
+        "go_type": "map[int][]int"
+      }
+    ]
+  },
+  {
+    "package": "main",
+    "name": "Http_test",
+    "docs": "",
+    "arguments": [
+      {
+        "name": "url",
+        "type": {
+          "go_type": "string"
+        }
+      }
+    ],
+    "return_type": [
+      {
+        "go_type": "unsafe.Pointer"
+      }
+    ]
+  },
+  {
+    "package": "main",
+    "name": "Init_go",
+    "docs": "Initializer function\n",
+    "arguments": [],
+    "return_type": []
+  }
+]
