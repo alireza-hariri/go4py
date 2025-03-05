@@ -1,6 +1,6 @@
-import IPython
 import click
 import os
+import subprocess
 from pathlib import Path
 
 from goopy.template_engine import render_template
@@ -36,6 +36,46 @@ def init(module_name):
 
     # print a message
     click.echo(f"Module {module_name} initialized.")
+
+
+@cli.command()
+@click.argument("module_name", required=False)
+def build(module_name):
+    """Build a go module by running make in its directory.
+
+    If module_name is not provided, searches all directories for Makefiles
+    and runs make in each directory that has one.
+    """
+    if module_name:
+        # Build a specific module
+        module_dir = Path(module_name)
+        if not module_dir.exists():
+            click.echo(f"Error: Module directory '{module_name}' does not exist.")
+            return
+
+        makefile_path = module_dir / "Makefile"
+        if not makefile_path.exists():
+            click.echo(f"Error: No Makefile found in '{module_name}' directory.")
+            return
+
+        click.echo(f"Building module '{module_name}'...")
+        subprocess.run(["make", "-C", str(module_dir), "-j2"])
+
+    else:
+        # Search all directories for Makefiles and build them
+        built_count = 0
+        for item in Path(".").iterdir():
+            if item.is_dir():
+                makefile_path = item / "Makefile"
+                if makefile_path.exists():
+                    click.echo(f"Building module in '{item}'...")
+                    subprocess.run(["make", "-C", str(item), "-j2"])
+                    built_count += 1
+
+        if built_count == 0:
+            click.echo("No modules with Makefiles found.")
+        else:
+            click.echo(f"Built {built_count} module(s).")
 
 
 if __name__ == "__main__":
