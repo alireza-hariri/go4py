@@ -156,7 +156,7 @@ class GoStringType(VarType):
         return "s"
 
     def converter(self, inp):
-        raise CgoLimitationError("don't return string from cgo")
+        raise CgoLimitationError("Don't return string from cgo")
 
 
 class BytesType(VarType):
@@ -227,6 +227,10 @@ class GoFunction(BaseModel):
     def model_post_init(self, __context):
         if self.return_type is None:
             self.return_type = NoneType()
+        # lowercase fn.name
 
     def __str__(self) -> str:
         return f"{self.package}.{self.name}"
+
+    def lowercase_name(self) -> str:
+        return self.name.lower()[0] + self.name[1:]

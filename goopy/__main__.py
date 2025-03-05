@@ -1,3 +1,4 @@
+import IPython
 import click
 import os
 from pathlib import Path
@@ -18,15 +19,19 @@ def cli():
 @click.argument("module_name")
 def init(module_name):
     """Initialize a go module with the given name."""
+
+    module_dir = Path(module_name)
+    if module_dir.exists():
+        click.echo(f"A directory with the name of {module_name} already exists.")
+        return
     # create directory with the name of the module and cd there
-    os.system(f"mkdir -p {module_name}")
-    os.chdir(module_name)
-    # create a go module with the name of the module
+    module_dir.mkdir()
+    # initialize a go module in root directory
     os.system(f"go mod init {module_name}")
     # for all files in template folder copy them to the module folder
     data = {"module_name": module_name}
     for file in TEMPLATE_DIR.iterdir():
-        dst_file = file.relative_to(TEMPLATE_DIR)
+        dst_file = module_dir / file.relative_to(TEMPLATE_DIR)
         dst_file.write_text(render_template(file.read_text(), data))
 
     # print a message

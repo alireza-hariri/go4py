@@ -13,4 +13,4 @@ if __name__ == "__main__":
     args = parse_args()
     module_name = args.module_name
     functions = get_go_functions(module_name)
-    gen_binding_file(module_name, functions, f"artifacts/{module_name}.c")
+    gen_binding_file(module_name, functions, f"artifacts/{module_name}_wrappers.c")
