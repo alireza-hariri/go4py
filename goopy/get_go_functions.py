@@ -11,11 +11,9 @@ logger = logging.getLogger(__name__)
 
 def get_go_functions(module_folder: str):
     """list all go exported functions in the go module"""
-    # Get the project root directory
-    project_root = Path(__file__).parent.parent / module_folder
 
     # Path to the generated functions.json file
-    functions_json_path = project_root / "artifacts/functions.json"
+    functions_json_path = Path("artifacts/functions.json")
 
     # Check if the functions.json file was generated
     if not functions_json_path.exists():

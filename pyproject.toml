@@ -1,12 +1,15 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
 [project]
-name = "go-proj"
+name = "goopy"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
     "click>=8.1.8",
-    "ipython>=8.32.0",
     "msgpack>=1.1.0",
     "pydantic>=2.10.6",
 ]
@@ -14,7 +17,15 @@ dependencies = [
 [dependency-groups]
 dev = [
     "fastapi>=0.115.10",
+    "ipython>=8.32.0",
     "pyperclip>=1.9.0",
+    "pytest>=8.3.5",
     "requests>=2.32.3",
     "uvicorn>=0.34.0",
 ]
+
+[project.scripts]
+goopy = "goopy.cli:cli"  # This creates the 'cooltool' executable
+
+[tool.setuptools]
+packages = ["goopy"]  # List all your package directories

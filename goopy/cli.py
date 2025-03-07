@@ -11,7 +11,7 @@ TEMPLATE_DIR = HERE / "templates"
 
 @click.group()
 def cli():
-    """A simple CLI with an init command."""
+    """Goopy CLI"""
     pass
 
 
@@ -39,32 +39,27 @@ def init(module_name):
 
 
 @cli.command()
-@click.argument("module_name", required=False)
-def build(module_name):
+@click.argument("build_path", required=False, default=".")
+def build(build_path):
     """Build a go module by running make in its directory.
 
     If module_name is not provided, searches all directories for Makefiles
     and runs make in each directory that has one.
     """
-    if module_name:
-        # Build a specific module
-        module_dir = Path(module_name)
-        if not module_dir.exists():
-            click.echo(f"Error: Module directory '{module_name}' does not exist.")
-            return
+    build_path = Path(build_path)
+    if not build_path.exists():
+        click.echo(f"Error: Module directory '{module_name}' does not exist.")
+        exit(1)
 
-        makefile_path = module_dir / "Makefile"
-        if not makefile_path.exists():
-            click.echo(f"Error: No Makefile found in '{module_name}' directory.")
-            return
-
-        click.echo(f"Building module '{module_name}'...")
-        subprocess.run(["make", "-C", str(module_dir), "-j2"])
+    makefile_path = build_path / "Makefile"
+    if makefile_path.exists():
+        click.echo(f"Building module '{build_path}'...")
+        subprocess.run(["make", "-C", str(build_path), "-j2"])
 
     else:
         # Search all directories for Makefiles and build them
         built_count = 0
-        for item in Path(".").iterdir():
+        for item in build_path.iterdir():
             if item.is_dir():
                 makefile_path = item / "Makefile"
                 if makefile_path.exists():
@@ -76,6 +71,22 @@ def build(module_name):
             click.echo("No modules with Makefiles found.")
         else:
             click.echo(f"Built {built_count} module(s).")
+
+
+@cli.command()
+@click.argument("args", nargs=-1, type=click.UNPROCESSED)
+def parse(args):
+    """parse go files in a directory to find exported functions."""
+    exetutable = HERE / "parse"
+    if not exetutable.exists():
+        # try to build it
+        os.system(f"go build -o {str(exetutable)} {HERE / '../go_cmd/parse'}")
+    if not exetutable.exists():
+        click.echo("Error: parse executable not found.")
+        # exit with error
+        exit(1)
+    cmd = [str(exetutable)] + list(args)
+    subprocess.run(cmd)
 
 
 if __name__ == "__main__":

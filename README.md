@@ -1,4 +1,7 @@
 
+
+# Still constructing core functionality!
+
 ```bash
 export LD_LIBRARY_PATH=./build
 ipython
@@ -44,6 +47,6 @@ for a in range(100):
 
 
 # TODO
- - [] warn the use if it uses string or other dynamicly allocated types as result
+ - [] Warn the user if it uses string or other dynamicly allocated types as result
  - [] unexported function warn + export with space (`// export`) 
  - [] python type definition file

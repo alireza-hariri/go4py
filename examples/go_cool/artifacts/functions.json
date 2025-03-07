@@ -241,6 +241,20 @@
   },
   {
     "package": "main",
+    "name": "Alaki",
+    "docs": "",
+    "arguments": [
+      {
+        "name": "f",
+        "type": {
+          "go_type": "func() int"
+        }
+      }
+    ],
+    "return_type": []
+  },
+  {
+    "package": "main",
     "name": "Http_test",
     "docs": "",
     "arguments": [

@@ -50,10 +50,41 @@ class VarType(BaseModel, ABC):
 
 
 class IntType(VarType):
-    go_type: Literal["int"] = "int"
+    go_type: Literal[
+        "int",
+        "int8",
+        "int16",
+        "int32",
+        "int64",
+        "uint",
+        "uint8",
+        "uint16",
+        "uint32",
+        "uint64",
+        "byte",
+        "rune",
+    ] = "int"
     bits: int = 64
     unsigned: bool = False
     need_copy: ClassVar[bool] = False
+
+    def model_post_init(self, __context):
+        if self.go_type in ["int", "uint"]:
+            self.bits = 64
+        elif self.go_type in ["int8", "uint8", "byte"]:
+            self.bits = 8
+        elif self.go_type in ["int16", "uint16"]:
+            self.bits = 16
+        elif self.go_type in ["int32", "uint32", "rune"]:
+            self.bits = 32
+        elif self.go_type in ["int64", "uint64"]:
+            self.bits = 64
+        else:
+            raise ValueError(f"Unsupported go type: {self.go_type}")
+        if self.go_type in ["uint", "uint8", "uint16", "uint32", "uint64", "byte"]:
+            self.unsigned = True
+        else:
+            self.unsigned = False
 
     def c_type(self) -> str:
         _sign = "" if not self.unsigned else "unsigned "
@@ -82,15 +113,24 @@ class IntType(VarType):
             raise ValueError(f"Unsupported bit size: {self.bits}")
 
     def converter(self, inp):
-        # PyLong_FromLong
-        # TODO: fix this for other ints
-        return f"PyLong_FromLong({inp})"
+        if self.unsigned:
+            return f"PyLong_FromUnsignedLong({inp})"
+        else:
+            return f"PyLong_FromLong({inp})"
 
 
 class FloatType(VarType):
     go_type: Literal["float64", "float32"] = "float"
     bits: int = 64
     need_copy: ClassVar[bool] = False
+
+    def model_post_init(self, __context):
+        if self.go_type == "float32":
+            self.bits = 32
+        elif self.go_type == "float64":
+            self.bits = 64
+        else:
+            raise ValueError(f"Unsupported float type: {self.go_type}")
 
     def c_type(self) -> str:
         if self.bits == 32:
@@ -218,11 +258,11 @@ class Variable(BaseModel):
 
 
 class GoFunction(BaseModel):
-    package: str
     name: str
-    docs: str | None
     arguments: list[Variable]
     return_type: list[RealType]
+    package: str = ""
+    docs: str = ""
 
     def model_post_init(self, __context):
         if self.return_type is None:

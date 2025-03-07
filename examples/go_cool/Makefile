@@ -33,7 +33,7 @@ ${ARTIFACTS_DIR}:
 
 # 1. Parsing Go codes
 ${PARSER_TARGET}: ${GO_FILES} ${ARTIFACTS_DIR}
-	go run ../goopy/parsing.go .
+	goopy parse .
 
 # 2. Build Go files
 ${GO_TARGET}: ${GO_FILES}

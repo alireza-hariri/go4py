@@ -112,6 +112,10 @@ func Tesing(native_map map[string]string) map[int][]int {
 	return m
 }
 
+func Alaki(f func() int) {
+	fmt.Println(f())
+}
+
 //export Http_test
 func Http_test(url string) unsafe.Pointer {
 

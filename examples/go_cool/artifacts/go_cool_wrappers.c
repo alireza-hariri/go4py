@@ -6,7 +6,7 @@
 #include <string.h>
 
 
-static PyObject* go_cool_transform(PyObject* self, PyObject* args) {
+static PyObject* go_cool_transform(PyObject* self, PyObject* args) { 
     char* s;
     if (!PyArg_ParseTuple(args, "s", &s))
         return NULL;
@@ -16,18 +16,15 @@ static PyObject* go_cool_transform(PyObject* self, PyObject* args) {
     free(result);
     return py_result;
 }
-
-static PyObject* go_cool_add(PyObject* self, PyObject* args) {
+static PyObject* go_cool_add(PyObject* self, PyObject* args) { 
     long a;
     long b;
     if (!PyArg_ParseTuple(args, "ll", &a, &b))
         return NULL;
     long result = Add(a,b);
-    PyObject* py_result = PyLong_FromLong(result);
-    return py_result;
+    return PyLong_FromLong(result);
 }
-
-static PyObject* go_cool_replace(PyObject* self, PyObject* args) {
+static PyObject* go_cool_replace(PyObject* self, PyObject* args) { 
     char* s;
     char* old;
     char* new;
@@ -41,8 +38,7 @@ static PyObject* go_cool_replace(PyObject* self, PyObject* args) {
     free(result);
     return py_result;
 }
-
-static PyObject* go_cool_randomString(PyObject* self, PyObject* args) {
+static PyObject* go_cool_randomString(PyObject* self, PyObject* args) { 
     long n;
     if (!PyArg_ParseTuple(args, "l", &n))
         return NULL;
@@ -51,17 +47,14 @@ static PyObject* go_cool_randomString(PyObject* self, PyObject* args) {
     free(result);
     return py_result;
 }
-
-static PyObject* go_cool_cosine(PyObject* self, PyObject* args) {
+static PyObject* go_cool_cosine(PyObject* self, PyObject* args) { 
     double x;
     if (!PyArg_ParseTuple(args, "d", &x))
         return NULL;
     double result = Cosine(x);
-    PyObject* py_result = PyFloat_FromDouble(result);
-    return py_result;
+    return PyFloat_FromDouble(result);
 }
-
-static PyObject* go_cool_f2str2(PyObject* self, PyObject* args) {
+static PyObject* go_cool_f2str2(PyObject* self, PyObject* args) { 
     double x;
     if (!PyArg_ParseTuple(args, "d", &x))
         return NULL;
@@ -70,18 +63,15 @@ static PyObject* go_cool_f2str2(PyObject* self, PyObject* args) {
     free(result);
     return py_result;
 }
-
-static PyObject* go_cool_str2f(PyObject* self, PyObject* args) {
+static PyObject* go_cool_str2f(PyObject* self, PyObject* args) { 
     char* s;
     if (!PyArg_ParseTuple(args, "s", &s))
         return NULL;
     GoString go_s = {s, (GoInt)strlen(s)};
     double result = Str2f(go_s);
-    PyObject* py_result = PyFloat_FromDouble(result);
-    return py_result;
+    return PyFloat_FromDouble(result);
 }
-
-static PyObject* go_cool_http_test(PyObject* self, PyObject* args) {
+static PyObject* go_cool_http_test(PyObject* self, PyObject* args) { 
     char* url;
     if (!PyArg_ParseTuple(args, "s", &url))
         return NULL;
@@ -91,13 +81,10 @@ static PyObject* go_cool_http_test(PyObject* self, PyObject* args) {
     free(result);
     return py_result;
 }
-
-static PyObject* go_cool_init_go(PyObject* self, PyObject* args) {
-
+static PyObject* go_cool_init_go(PyObject* self, PyObject* args) { 
     Init_go();
     return Py_None;
 }
-
 
 static PyMethodDef Methods[] = {
     {"transform", go_cool_transform, METH_VARARGS, "transform"},
