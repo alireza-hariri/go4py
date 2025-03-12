@@ -53,6 +53,20 @@ func MyFunc(a int, b string) [](int) {
 	return []int{1, 2, 3, 4, 5}
 }
 
+//export Randn
+func Randn() float64 {
+	return rand.NormFloat64()
+}
+
+//export Rands
+func Rands(n int) []float64 {
+	res := make([]float64, n)
+	for i := range res {
+		res[i] = rand.Float64()
+	}
+	return res
+}
+
 // ggygnnmmm
 func main() {
 

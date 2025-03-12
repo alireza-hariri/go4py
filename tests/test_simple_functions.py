@@ -28,9 +28,7 @@ fn = GoFunction(
 fn_res = """
 static PyObject* test_func_two(PyObject* self, PyObject* args) { 
     struct Func_two_return result = Func_two();
-    PyObject* py_result = PyTuple_New(2);
-    PyTuple_SetItem(py_result, 0, PyLong_FromLong(result.r0));
-    PyTuple_SetItem(py_result, 1, PyFloat_FromFloat(result.r1));
+    PyObject* py_result = Py_BuildValue("lf", result.r0, result.r1);
     return py_result;
 }"""
 test_cases["tuple_return"] = (fn, fn_res)
@@ -87,7 +85,7 @@ static PyObject* test_func_5(PyObject* self, PyObject* args) {
     free(result.r1);
     return py_result;
 }"""
-test_cases["tuple_return"] = (fn, fn_res)
+test_cases["str_tuple_return"] = (fn, fn_res)
 
 #####
 
@@ -136,8 +134,24 @@ static PyObject* test_func_7(PyObject* self, PyObject* args) {
 }"""
 test_cases["multi_arg_bool_return"] = (fn, fn_res)
 
+#####
 
-# print(gen_fn(fn, "test"))
+fn = GoFunction(
+    name="Func_8",
+    arguments=[
+        {"name": "a", "type": {"go_type": "*C.char"}},
+    ],
+    return_type=[],
+)
+fn_res = """
+static PyObject* test_func_8(PyObject* self, PyObject* args) { 
+    char* a;
+    if (!PyArg_ParseTuple(args, "s", &a))
+        return NULL;
+    Func_8(a);
+    return Py_None;
+}"""
+test_cases["char_ptr_no_return"] = (fn, fn_res)
 
 
 @pytest.mark.parametrize("fn,fn_res", test_cases.values(), ids=test_cases.keys())

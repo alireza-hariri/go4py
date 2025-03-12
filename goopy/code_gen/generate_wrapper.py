@@ -2,9 +2,11 @@ from goopy.code_gen.copy_logic import gen_go_copy
 from goopy.types import (
     BoolType,
     CStringType,
+    ErrorType,
     FloatType,
     GoFunction,
     IntType,
+    UnknownType,
     VarType,
     Variable,
 )
@@ -20,11 +22,15 @@ class ArgumentParser:
         self.arg_list = []
         self.check_logic = ""
         self.copy_logic = ""
+        self.free_logic = ""
 
     def addArg(self, var: Variable):
         self.arg_decl.append(f"    {var.type.c_type()} {var.name};")
         if var.type.need_copy:
-            self.copy_logic += gen_go_copy(var)
+            copy_code, free_logic = gen_go_copy(var, self.free_logic)
+            self.copy_logic += copy_code
+            self.free_logic = free_logic
+
         self.format_string += var.type.fmt_str()
         self.arg_list.append("&" + var.name)
 
@@ -87,7 +93,7 @@ class ReturnConverter:
         return ""
 
     def gen_free_and_refdec(self):
-        if self.t.need_copy:
+        if self.t.need_free():
             return f"\n    free({self.var});"
         else:
             return ""
@@ -98,45 +104,60 @@ class ReturnConverter:
         result = self.gen_py_result()
         if self.t.need_copy:
             result += self.gen_copys()
-            result += self.gen_free_and_refdec()
+        result += self.gen_free_and_refdec()
         return result
 
 
-def gen_fn(fn: GoFunction, module_name: str):
-    arg_parser = ArgumentParser()
-    for arg in fn.arguments:
-        arg_parser.addArg(arg)
-    if len(fn.return_type) == 0:
-        return_code = "\n    return Py_None;"
+def gen_return_code(fn: GoFunction):
+    return_types = fn.return_type
+    # if the last element is an error, we should handle it
+    if len(return_types) > 1 and type(return_types[-1]) is ErrorType:
+        return_types = return_types[:-1]
+        err_handling = """
+    if (result.err != nil) {{
+        PyErr_SetString(PyExc_RuntimeError, result.err.Error());
+        return NULL;
+    }}
+"""
     else:
-        if len(fn.return_type) == 1:
-            conv = ReturnConverter(fn.return_type[0])
-            return_code = conv.gen_code()
-            return_code += f"\n    return {conv.return_var()};"
+        err_handling = ""
+    code = err_handling
+
+    if len(return_types) == 0:
+        code += "\n    return Py_None;"
+    else:
+        if len(return_types) == 1:
+            if type(fn.return_type[-1]) is ErrorType:
+                conv = ReturnConverter(return_types[0], "result.r0")
+            else:
+                conv = ReturnConverter(return_types[0], "result")
+            code += conv.gen_code() + f"\n    return {conv.return_var()};"
         else:
             return_converters = [
-                ReturnConverter(t, f"result.r{i}") for i, t in enumerate(fn.return_type)
+                ReturnConverter(t, f"result.r{i}") for i, t in enumerate(return_types)
             ]
-            # return_code = "".join(c.gen_code() for c in return_converters)
-            # return_code += (
-            #     "\n    PyObject* py_result = PyTuple_New(" + str(len(fn.return_type)) + ");"
-            # )
-            # for i, c in enumerate(return_converters):
-            #     return_code += f"\n    PyTuple_SetItem(py_result, {i}, {c.return_var()});"
-            # return_code += "\n    return py_result;"
-
             code = '\n    PyObject* py_result = Py_BuildValue("'
-            for t in fn.return_type:
+            for t in return_types:
                 code += t.fmt_str()
             code += '"'
             for c in return_converters:
                 code += f", {c.var}"
             code += ");"
-            return_code = code
             for c in return_converters:
-                return_code += c.gen_free_and_refdec()
-            return_code += "\n    return py_result;"
+                code += c.gen_free_and_refdec()
+            code += "\n    return py_result;"
+    return code
+
+
+def gen_fn(fn: GoFunction, module_name: str):
+    arg_parser = ArgumentParser()
+    for arg in fn.arguments:
+        if type(arg.type) is UnknownType:
+            arg.type = arg.type.resolve()
+        arg_parser.addArg(arg)
+    return_code = gen_return_code(fn)
+
     return f"""
 static PyObject* {module_name}_{fn.lowercase_name()}(PyObject* self, PyObject* args) {{ {arg_parser.gen_code()}
-{gen_fn_call(fn)}{return_code}
+{gen_fn_call(fn)}{arg_parser.free_logic}{return_code}
 }}"""

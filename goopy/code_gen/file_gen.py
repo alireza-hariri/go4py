@@ -1,36 +1,42 @@
+import os
 from pathlib import Path
 from goopy.code_gen.generate_wrapper import gen_fn
-from goopy.types import CgoLimitationError, GoFunction
+from goopy.types import CgoLimitationError, GoFunction, GoopyConfig
 
 
-def template(module: str, functions_code: list, methods: str):
+def template(config: GoopyConfig, functions_code: list, methods: str):
+    custom_incudes = "\n".join(config.custom_incudes)
+    custom_methods = "".join(["\n    " + m for m in config.custom_methods])
+
     return f"""
 #define PY_SSIZE_T_CLEAN
 
 #include <Python.h>
-#include "../artifacts/build/lib{module}.h"
 #include <string.h>
+#include "../artifacts/build/lib{config.module_name}.h"
+{custom_incudes}
 
 {functions_code}
 
-static PyMethodDef Methods[] = {{{methods}
+static PyMethodDef Methods[] = {{{methods}{custom_methods}
     {{NULL, NULL, 0, NULL}}
 }};
 
-static struct PyModuleDef {module}_module = {{
+static struct PyModuleDef {config.module_name}_module = {{
     PyModuleDef_HEAD_INIT,
-    "{module}",
+    "{config.module_name}",
     NULL,
     -1,
     Methods
 }};
-PyMODINIT_FUNC PyInit_{module}(void) {{
-    return PyModule_Create(&{module}_module);
+PyMODINIT_FUNC PyInit_{config.module_name}(void) {{
+    return PyModule_Create(&{config.module_name}_module);
 }}
 """
 
 
-def gen_binding_file(module: str, functions: list[GoFunction], dest: Path | str):
+def gen_binding_file(config: GoopyConfig, functions: list[GoFunction], dest: Path | str):
+    module = config.module_name
     functions_code = ""
     res_functions = []
     for fn in functions:
@@ -45,5 +51,6 @@ def gen_binding_file(module: str, functions: list[GoFunction], dest: Path | str)
     for fn in res_functions:
         fn_name = fn.lowercase_name()
         methods += f'\n    {{"{fn_name}", {module}_{fn_name}, METH_VARARGS, "{fn_name}"}},'
+    os.makedirs(os.path.dirname(dest), exist_ok=True)
     with open(dest, "w") as f:
-        f.write(template(module, functions_code, methods))
+        f.write(template(config, functions_code, methods))

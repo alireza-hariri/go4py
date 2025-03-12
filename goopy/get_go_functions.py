@@ -33,7 +33,9 @@ def get_go_functions(module_folder: str):
             go_functions.append(go_function)
             # print(f"Parsed function: {go_function.name}")
         except Exception as e:
-            logger.warning(f"function skipped: {func_data['name']}")
+            logger.warning(
+                f"function skipped: {func_data['name']} (set log-level to DEBUG for more info)"
+            )
             logger.debug(f"Error: {e}")
 
     logger.info(f"Successfully parsed {len(go_functions)} functions")

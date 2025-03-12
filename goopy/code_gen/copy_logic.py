@@ -1,15 +1,20 @@
-from goopy.types import GoStringType, Variable
+from goopy.code_gen.slice import go_slice_from_py_list
+from goopy.types import GoStringType, SliceType, Variable
 
 
-def gen_go_copy(v: Variable):
+def gen_go_copy(v: Variable, free_logic: str):
     """
-    this function will convert the c type to go type variable (may need a full copy)
+    this function will convert the c type to go type variable
     it will also prefixed the name with `go_`
 
     """
     match v.type:
         case GoStringType():
-            return f"""
+            copy_logic = f"""
     GoString go_{v.name} = {{{v.name}, (GoInt)strlen({v.name})}};"""
+            return copy_logic, free_logic
+        case SliceType():
+            return go_slice_from_py_list(v, free_logic)
         case _:
-            return ""
+            breakpoint()
+            raise NotImplementedError()

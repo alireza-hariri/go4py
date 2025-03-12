@@ -115,6 +115,35 @@
   },
   {
     "package": "main",
+    "name": "Randn",
+    "docs": "",
+    "arguments": [],
+    "return_type": [
+      {
+        "go_type": "float64"
+      }
+    ]
+  },
+  {
+    "package": "main",
+    "name": "Rands",
+    "docs": "",
+    "arguments": [
+      {
+        "name": "n",
+        "type": {
+          "go_type": "int"
+        }
+      }
+    ],
+    "return_type": [
+      {
+        "go_type": "[]float64"
+      }
+    ]
+  },
+  {
+    "package": "main",
     "name": "Cosine",
     "docs": "",
     "arguments": [
@@ -198,17 +227,6 @@
   },
   {
     "package": "main",
-    "name": "Map_test",
-    "docs": "",
-    "arguments": [],
-    "return_type": [
-      {
-        "go_type": "[]C.SS_KVPair"
-      }
-    ]
-  },
-  {
-    "package": "main",
     "name": "Slice_inp_test",
     "docs": "",
     "arguments": [
@@ -241,20 +259,6 @@
   },
   {
     "package": "main",
-    "name": "Alaki",
-    "docs": "",
-    "arguments": [
-      {
-        "name": "f",
-        "type": {
-          "go_type": "func() int"
-        }
-      }
-    ],
-    "return_type": []
-  },
-  {
-    "package": "main",
     "name": "Http_test",
     "docs": "",
     "arguments": [
@@ -273,9 +277,30 @@
   },
   {
     "package": "main",
-    "name": "Init_go",
-    "docs": "Initializer function\n",
-    "arguments": [],
+    "name": "SomeFunc",
+    "docs": "",
+    "arguments": [
+      {
+        "name": "nums",
+        "type": {
+          "go_type": "[]int"
+        }
+      }
+    ],
+    "return_type": []
+  },
+  {
+    "package": "main",
+    "name": "SomeFunc2",
+    "docs": "",
+    "arguments": [
+      {
+        "name": "nums",
+        "type": {
+          "go_type": "[]string"
+        }
+      }
+    ],
     "return_type": []
   }
 ]

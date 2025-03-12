@@ -1,5 +1,4 @@
-module cool_pkg
-
+module github.com/alireza-hariri/goopy
 
 go 1.23.6
 

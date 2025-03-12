@@ -7,6 +7,13 @@ import logging
 logger = logging.getLogger(__name__)
 
 
+class GoopyConfig(BaseModel):
+    custom_incudes: list[str] = []
+    custom_methods: list[str] = []
+    output_file: str = "cpython-extention/bindings.c"
+    module_name: str = ""
+
+
 # cusotom exception: cgo limitation
 class CgoLimitationError(Exception):
     pass
@@ -47,6 +54,18 @@ class VarType(BaseModel, ABC):
 
     @abstractmethod
     def converter(self, inp: str): ...
+
+    @abstractmethod
+    def from_py_converter(self, inp: str): ...
+
+    @abstractmethod
+    def check(self, inp): ...
+
+    def need_free(self):
+        return False
+
+    def cgo_type(self) -> str:
+        return self.c_type()
 
 
 class IntType(VarType):
@@ -118,6 +137,27 @@ class IntType(VarType):
         else:
             return f"PyLong_FromLong({inp})"
 
+    def from_py_converter(self, inp):
+        if self.bits == 64:
+            if self.unsigned:
+                return f"PyLong_AsUnsignedLong({inp})"
+            else:
+                return f"PyLong_AsLong({inp})"
+        elif self.bits == 32:
+            if self.unsigned:
+                raise Exception(
+                    "no python function found for conversion to uint32 use int64, uint64 or int32 instead"
+                )
+            else:
+                return f"PyLong_AsInt({inp})"
+        else:
+            raise Exception(
+                f"no python function found for conversion to {self.c_type()} use int64, uint64 or int32 instead"
+            )
+
+    def check(self, inp):
+        return f"PyLong_Check({inp})"
+
 
 class FloatType(VarType):
     go_type: Literal["float64", "float32"] = "float"
@@ -156,6 +196,16 @@ class FloatType(VarType):
         else:
             raise ValueError(f"Unsupported bit size: {self.bits}")
 
+    def from_py_converter(self, inp):
+        if self.bits == 64:
+            return f"PyFloat_AsDouble({inp})"
+        else:
+            logger.warning(f"casting double to float in C for {inp} (may overflow silently)")
+            return f"(float)PyFloat_AsDouble({inp})"
+
+    def check(self, inp):
+        return f"PyFloat_Check({inp})"
+
 
 class BoolType(VarType):
     go_type: Literal["bool"] = "bool"
@@ -170,10 +220,16 @@ class BoolType(VarType):
     def converter(self, inp):
         return f"PyBool_FromLong({inp})"
 
+    def from_py_converter(self, inp):
+        return f"PyObject_IsTrue({inp})"
+
+    def check(self, inp):
+        return None  # skip checking for bool
+
 
 class CStringType(VarType):
     go_type: Literal["*C.char"] = "*C.char"
-    need_copy: ClassVar[bool] = True
+    need_copy: ClassVar[bool] = False
 
     def c_type(self) -> str:
         return "char*"
@@ -183,6 +239,15 @@ class CStringType(VarType):
 
     def converter(self, inp):
         return f"PyUnicode_FromString({inp})"
+
+    def from_py_converter(self, inp):
+        return f"PyUnicode_AsUTF8({inp})"
+
+    def check(self, inp):
+        return f"PyUnicode_Check({inp})"
+
+    def need_free(self):
+        return True
 
 
 class GoStringType(VarType):
@@ -197,6 +262,18 @@ class GoStringType(VarType):
 
     def converter(self, inp):
         raise CgoLimitationError("Don't return string from cgo")
+
+    def from_py_converter(self, inp):
+        return f"PyUnicode_AsUTF8({inp})"
+
+    def check(self, inp):
+        return f"PyUnicode_Check({inp})"
+
+    def need_free(self):
+        return True
+
+    def cgo_type(self):
+        return "GoString"
 
 
 class BytesType(VarType):
@@ -220,36 +297,89 @@ class BytesType(VarType):
         else:
             return NotImplementedError()
 
+    def from_py_converter(self, inp):
+        return f"PyBytes_AsString({inp})"
 
-class NoneType(VarType):
-    go_type: Literal[""] = ""
+    def check(self, inp):
+        return f"PyBytes_Check({inp})"
+
+
+class ErrorType(VarType):
+    go_type: Literal["error"] = "error"
     need_copy: ClassVar[bool] = False
 
     def c_type(self) -> str:
-        return ""
+        raise NotImplementedError()
 
     def fmt_str(self) -> str:
         raise NotImplementedError()
 
+    def set_exeption(self, inp):
+        return f"PyErr_SetString(PyExc_RuntimeError, {inp})"
+
+
+class UnknownType(VarType):
+    go_type: str
+    need_copy: bool = True
+
+    def c_type(self): ...
+
+    def fmt_str(self): ...
+
+    def converter(self, inp): ...
+
+    def from_py_converter(self, inp): ...
+
+    def check(self, inp): ...
+
+    def need_free(self): ...
+
+    def resolve(self):
+        """try to convert this type to other types"""
+        if self.go_type.startswith("[]"):
+            return SliceType(item_type={"go_type": self.go_type[2:]})
+
+
+SimpleTypes: TypeAlias = (
+    IntType
+    | FloatType
+    | BoolType
+    | GoStringType
+    | CStringType
+    | BytesType
+    | ErrorType
+    | UnknownType  # Complex Types will fall into this but will be resolved later
+)
+
+
+class SliceType(VarType):
+    go_type: Literal["Slice"] = "Slice"
+    item_type: SimpleTypes
+    need_copy: ClassVar[bool] = True
+
+    def c_type(self) -> str:
+        return "PyObject*"
+
+    def fmt_str(self) -> str:
+        return "O"
+
     def converter(self, inp):
-        return "Py_None"
+        raise NotImplementedError()
+
+    def from_py_converter(self, inp):
+        return NotImplementedError()
+
+    def check(self, inp):
+        return f"PyList_Check({inp})"
+
+    def need_free(self):
+        return True
+
+    def cgo_type(self) -> str:
+        return f"{self.item_type.cgo_type()}*"
 
 
-# class SliceType(VarType):
-#     go_type: Literal["slice"] = "slice"
-#     need_copy: ClassVar[bool] = True
-
-#     def c_type(self) -> str:
-#         return "PyObject*"
-
-#     def fmt_str(self) -> str:
-#         return "O"
-
-#     def converter(self, inp):
-#         return f"PyList_New({inp})"
-
-
-RealType: TypeAlias = IntType | FloatType | BoolType | GoStringType | CStringType | BytesType
+RealType: TypeAlias = SimpleTypes | SliceType
 
 
 class Variable(BaseModel):
@@ -263,11 +393,6 @@ class GoFunction(BaseModel):
     return_type: list[RealType]
     package: str = ""
     docs: str = ""
-
-    def model_post_init(self, __context):
-        if self.return_type is None:
-            self.return_type = NoneType()
-        # lowercase fn.name
 
     def __str__(self) -> str:
         return f"{self.package}.{self.name}"

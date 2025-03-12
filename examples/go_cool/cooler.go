@@ -1,11 +1,5 @@
 package main
 
-/*
-typedef struct {
-    char* k;
-    char* v;
-} SS_KVPair;
-*/
 import "C"
 
 import (
@@ -65,21 +59,6 @@ func Fff() []*C.char {
 	return cStrings
 }
 
-//export Map_test
-func Map_test() []C.SS_KVPair {
-	_map := map[string]string{"hello": "world", "example": "example"}
-	var c_map []C.SS_KVPair = allocSlice[C.SS_KVPair](len(_map))
-
-	i := 0
-	for k, v := range _map {
-		c_map[i].k = C.CString(k)
-		c_map[i].v = C.CString(v)
-		i++
-	}
-
-	return c_map
-}
-
 func alaki() (*C.char, int) {
 
 	return C.CString("hello"), 5
@@ -112,10 +91,6 @@ func Tesing(native_map map[string]string) map[int][]int {
 	return m
 }
 
-func Alaki(f func() int) {
-	fmt.Println(f())
-}
-
 //export Http_test
 func Http_test(url string) unsafe.Pointer {
 
@@ -140,10 +115,7 @@ func Http_test(url string) unsafe.Pointer {
 
 var httpClient *http.Client
 
-// Initializer function
-//
-//export Init_go
-func Init_go() {
+func init() {
 	httpClient = &http.Client{
 		Transport: &http.Transport{
 			MaxIdleConns:        100,              // Total max idle connections
@@ -155,4 +127,18 @@ func Init_go() {
 		},
 		Timeout: 30 * time.Second, // Overall request timeout
 	}
+}
+
+func callback_inp(f func() int) {
+	fmt.Println(f())
+}
+
+//export SomeFunc
+func SomeFunc(nums []int) {
+	fmt.Println(nums)
+}
+
+//export SomeFunc2
+func SomeFunc2(nums []string) {
+	fmt.Println(nums)
 }

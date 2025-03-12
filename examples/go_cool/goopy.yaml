@@ -1,0 +1,6 @@
+
+custom_incudes:
+  - '#include "./other.h"'
+
+custom_methods:
+  - '{"someFunc2", go_cool_someFunc2, METH_VARARGS, "someFunc2"},'

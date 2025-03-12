@@ -12,6 +12,7 @@ dependencies = [
     "click>=8.1.8",
     "msgpack>=1.1.0",
     "pydantic>=2.10.6",
+    "pyyaml>=6.0.2",
 ]
 
 [dependency-groups]
@@ -29,3 +30,4 @@ goopy = "goopy.cli:cli"  # This creates the 'cooltool' executable
 
 [tool.setuptools]
 packages = ["goopy"]  # List all your package directories
+

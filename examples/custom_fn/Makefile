@@ -9,7 +9,7 @@
 .PHONY: clean goopy-wrapper c-build
 
 # Configuration variables
-MODULE_NAME := {{ module_name }}
+MODULE_NAME := custom_fn
 BUILD_DIR := ./artifacts/build
 ARTIFACTS_DIR := ./artifacts
 
@@ -31,7 +31,7 @@ GO_FILES := $(wildcard *.go)
 ${ARTIFACTS_DIR}:
 	mkdir -p ${ARTIFACTS_DIR}
 
-# 1. Parsing Go files
+# 1. Parsing Go codes
 ${PARSER_TARGET}: ${GO_FILES} ${ARTIFACTS_DIR}
 	goopy parse .
 

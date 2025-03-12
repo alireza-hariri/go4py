@@ -26,8 +26,17 @@ def init(module_name):
         return
     # create directory with the name of the module and cd there
     module_dir.mkdir()
-    # initialize a go module in root directory
-    os.system(f"go mod init {module_name}")
+
+    # Check if we're already inside a Go module (check current and parent directory)
+    current_go_mod_exists = Path("go.mod").exists()
+    parent_go_mod_exists = Path("..").joinpath("go.mod").exists()
+
+    if not (current_go_mod_exists or parent_go_mod_exists):
+        # initialize a go module in root directory
+        os.system(f"go mod init {module_name}")
+    else:
+        click.echo("Already inside a Go module, skipping 'go mod init'")
+
     # for all files in template folder copy them to the module folder
     data = {"module_name": module_name}
     for file in TEMPLATE_DIR.iterdir():
@@ -48,7 +57,7 @@ def build(build_path):
     """
     build_path = Path(build_path)
     if not build_path.exists():
-        click.echo(f"Error: Module directory '{module_name}' does not exist.")
+        click.echo(f"Error: Module directory '{build_path}' does not exist.")
         exit(1)
 
     makefile_path = build_path / "Makefile"

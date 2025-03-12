@@ -2,8 +2,9 @@
 #define PY_SSIZE_T_CLEAN
 
 #include <Python.h>
-#include "../artifacts/build/libgo_cool.h"
 #include <string.h>
+#include "../artifacts/build/libgo_cool.h"
+#include "./other.h"
 
 
 static PyObject* go_cool_transform(PyObject* self, PyObject* args) { 
@@ -47,6 +48,10 @@ static PyObject* go_cool_randomString(PyObject* self, PyObject* args) {
     free(result);
     return py_result;
 }
+static PyObject* go_cool_randn(PyObject* self, PyObject* args) { 
+    double result = Randn();
+    return PyFloat_FromDouble(result);
+}
 static PyObject* go_cool_cosine(PyObject* self, PyObject* args) { 
     double x;
     if (!PyArg_ParseTuple(args, "d", &x))
@@ -81,21 +86,18 @@ static PyObject* go_cool_http_test(PyObject* self, PyObject* args) {
     free(result);
     return py_result;
 }
-static PyObject* go_cool_init_go(PyObject* self, PyObject* args) { 
-    Init_go();
-    return Py_None;
-}
 
 static PyMethodDef Methods[] = {
     {"transform", go_cool_transform, METH_VARARGS, "transform"},
     {"add", go_cool_add, METH_VARARGS, "add"},
     {"replace", go_cool_replace, METH_VARARGS, "replace"},
     {"randomString", go_cool_randomString, METH_VARARGS, "randomString"},
+    {"randn", go_cool_randn, METH_VARARGS, "randn"},
     {"cosine", go_cool_cosine, METH_VARARGS, "cosine"},
     {"f2str2", go_cool_f2str2, METH_VARARGS, "f2str2"},
     {"str2f", go_cool_str2f, METH_VARARGS, "str2f"},
     {"http_test", go_cool_http_test, METH_VARARGS, "http_test"},
-    {"init_go", go_cool_init_go, METH_VARARGS, "init_go"},
+    {"someFunc2", go_cool_someFunc2, METH_VARARGS, "someFunc2"},
     {NULL, NULL, 0, NULL}
 };
 

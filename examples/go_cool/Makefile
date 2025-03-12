@@ -45,7 +45,7 @@ goopy-wrapper: ${PARSER_TARGET}
 
 # 4. Build final shared library
 c-build: ${GO_TARGET} goopy-wrapper
-	gcc ${CFLAGS} -o ${OUTPUT_FILE} ${ARTIFACTS_DIR}/${MODULE_NAME}_wrappers.c ${LDFLAGS} -I${PYTHON_INCLUDE}
+	gcc ${CFLAGS} -o ${OUTPUT_FILE} $(wildcard cpython-extention/*.c) ${LDFLAGS} -I${PYTHON_INCLUDE}
 	@echo "Build complete: ${OUTPUT_FILE}"
 
 # Clean build artifacts
