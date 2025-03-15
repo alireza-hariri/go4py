@@ -7,7 +7,7 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-class GoopyConfig(BaseModel):
+class go4pyConfig(BaseModel):
     custom_incudes: list[str] = []
     custom_methods: list[str] = []
     output_file: str = "cpython-extention/bindings.c"

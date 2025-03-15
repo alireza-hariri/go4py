@@ -1,5 +1,5 @@
-from goopy.code_gen.slice import go_slice_from_py_list
-from goopy.types import ByteSliceType, GoStringType, SliceType, Variable
+from go4py.code_gen.slice import go_slice_from_py_list
+from go4py.types import ByteSliceType, GoStringType, SliceType, Variable
 
 
 def gen_go_copy(v: Variable, free_logic: str):

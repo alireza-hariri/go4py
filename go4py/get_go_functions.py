@@ -3,7 +3,7 @@ import os
 import subprocess
 from pathlib import Path
 import logging
-from goopy.types import GoFunction
+from go4py.types import GoFunction
 
 
 logger = logging.getLogger(__name__)

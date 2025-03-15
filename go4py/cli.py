@@ -3,7 +3,7 @@ import os
 import subprocess
 from pathlib import Path
 
-from goopy.template_engine import render_template
+from go4py.template_engine import render_template
 
 HERE = Path(__file__).parent
 TEMPLATE_DIR = HERE / "templates"
@@ -11,7 +11,7 @@ TEMPLATE_DIR = HERE / "templates"
 
 @click.group()
 def cli():
-    """Goopy CLI"""
+    """go4py CLI"""
     pass
 
 

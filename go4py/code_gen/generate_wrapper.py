@@ -1,6 +1,6 @@
-from goopy.code_gen.copy_logic import gen_go_copy
-from goopy.code_gen.slice import indent
-from goopy.types import (
+from go4py.code_gen.copy_logic import gen_go_copy
+from go4py.code_gen.slice import indent
+from go4py.types import (
     BoolType,
     ByteSliceType,
     CStringType,

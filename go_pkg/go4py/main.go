@@ -1,18 +1,7 @@
-package goopy
+package go4py
 
-/*
-#include "goopy.h"
-
-*/
 import "C"
 import "unsafe"
-
-func CError(err error) C.Error {
-	if err == nil {
-		return nil
-	}
-	return C.CString(err.Error())
-}
 
 // make a new go slice with unsafe pointer so it can be passable to C
 func MakeSlice[T any](len int) []T {

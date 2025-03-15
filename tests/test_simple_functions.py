@@ -1,7 +1,7 @@
 import pytest
 
-from goopy.code_gen.generate_wrapper import gen_fn
-from goopy.types import GoFunction
+from go4py.code_gen.generate_wrapper import gen_fn
+from go4py.types import GoFunction
 
 
 test_cases = {}

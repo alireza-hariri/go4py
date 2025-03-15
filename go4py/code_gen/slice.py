@@ -1,4 +1,4 @@
-from goopy.types import Variable, VarType, GoStringType
+from go4py.types import Variable, VarType, GoStringType
 
 need_c_convert = [GoStringType]
 

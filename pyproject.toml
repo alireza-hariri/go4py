@@ -3,7 +3,7 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "goopy"
+name = "go4py"
 version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
@@ -27,8 +27,8 @@ dev = [
 ]
 
 [project.scripts]
-goopy = "goopy.cli:cli"  # This creates the 'cooltool' executable
+go4py = "go4py.cli:cli"  # This creates the 'cooltool' executable
 
 [tool.setuptools]
-packages = ["goopy"]  # List all your package directories
+packages = ["go4py"]  # List all your package directories
 

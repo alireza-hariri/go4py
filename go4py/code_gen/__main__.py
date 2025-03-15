@@ -1,11 +1,11 @@
 from pydantic import BaseModel
-from goopy.code_gen.file_gen import gen_binding_file
-from goopy.get_go_functions import get_go_functions
+from go4py.code_gen.file_gen import gen_binding_file
+from go4py.get_go_functions import get_go_functions
 import argparse
 import os
 import yaml
 
-from goopy.types import GoopyConfig
+from go4py.types import go4pyConfig
 
 
 def parse_args():
@@ -15,11 +15,11 @@ def parse_args():
 
 
 def read_config():
-    yaml_file = "goopy.yaml"
+    yaml_file = "go4py.yaml"
     if os.path.exists(yaml_file):
         with open(yaml_file, "r") as file:
-            goopy_config = yaml.safe_load(file)
-            return goopy_config
+            go4py_config = yaml.safe_load(file)
+            return go4py_config
     return {}
 
 
@@ -29,7 +29,7 @@ if __name__ == "__main__":
     functions = get_go_functions(module_path)
     module_name = module_path.split("/")[-1]
 
-    config = GoopyConfig.model_validate(read_config())
+    config = go4pyConfig.model_validate(read_config())
     config.module_name = module_name
 
     gen_binding_file(config, functions, "cpython-extention/autogen_bindings.c")

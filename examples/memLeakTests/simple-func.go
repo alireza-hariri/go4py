@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"math/rand"
 
-	"github.com/alireza-hariri/goopy/go_pkg/goopy"
+	"github.com/alireza-hariri/go4py/go_pkg/go4py"
 )
 
 //export Func_x
@@ -54,7 +54,7 @@ func Func_10() []byte {
 	if rand.Intn(2) == 0 {
 		return nil
 	}
-	return goopy.CopySlice(data)
+	return go4py.CopySlice(data)
 }
 
 //export Func_11
@@ -73,12 +73,12 @@ func Func_11() ([]byte, []byte) {
 	}
 
 	if rand.Intn(2) == 0 {
-		return nil, goopy.CopySlice(data2)
+		return nil, go4py.CopySlice(data2)
 	}
 	if rand.Intn(2) == 0 {
-		return goopy.CopySlice(data1), nil
+		return go4py.CopySlice(data1), nil
 	}
-	return goopy.CopySlice(data1), goopy.CopySlice(data2)
+	return go4py.CopySlice(data1), go4py.CopySlice(data2)
 }
 
 func main() {}

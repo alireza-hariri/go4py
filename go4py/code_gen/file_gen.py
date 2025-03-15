@@ -1,10 +1,10 @@
 import os
 from pathlib import Path
-from goopy.code_gen.generate_wrapper import gen_fn
-from goopy.types import CgoLimitationError, GoFunction, GoopyConfig
+from go4py.code_gen.generate_wrapper import gen_fn
+from go4py.types import CgoLimitationError, GoFunction, go4pyConfig
 
 
-def template(config: GoopyConfig, functions_code: list, methods: str):
+def template(config: go4pyConfig, functions_code: list, methods: str):
     custom_incudes = "\n".join(config.custom_incudes)
     custom_methods = "".join(["\n    " + m for m in config.custom_methods])
 
@@ -40,7 +40,7 @@ PyMODINIT_FUNC PyInit_{config.module_name}(void) {{
 """
 
 
-def gen_binding_file(config: GoopyConfig, functions: list[GoFunction], dest: Path | str):
+def gen_binding_file(config: go4pyConfig, functions: list[GoFunction], dest: Path | str):
     module = config.module_name
     functions_code = ""
     res_functions = []

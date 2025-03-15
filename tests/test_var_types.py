@@ -1,7 +1,7 @@
 import pytest
 
 
-from goopy.types import IntType, CStringType, GoStringType, BoolType, FloatType, Variable
+from go4py.types import IntType, CStringType, GoStringType, BoolType, FloatType, Variable
 
 int_test_cases = {}
 

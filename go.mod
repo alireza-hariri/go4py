@@ -1,4 +1,4 @@
-module github.com/alireza-hariri/goopy
+module github.com/alireza-hariri/go4py
 
 go 1.23.6
 

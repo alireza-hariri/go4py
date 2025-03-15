@@ -6,7 +6,7 @@
 # 4. Compiling everything into a shared library
 
 
-.PHONY: clean goopy-wrapper c-build
+.PHONY: clean go4py-wrapper c-build
 
 # Configuration variables
 MODULE_NAME := go_cool
@@ -33,18 +33,18 @@ ${ARTIFACTS_DIR}:
 
 # 1. Parsing Go codes
 ${PARSER_TARGET}: ${GO_FILES} ${ARTIFACTS_DIR}
-	goopy parse .
+	go4py parse .
 
 # 2. Build Go files
 ${GO_TARGET}: ${GO_FILES}
 	go build -buildmode=c-archive -o ${BUILD_DIR}/lib${MODULE_NAME}.a .
 
 # 3. Generate Python wrapper code
-goopy-wrapper: ${PARSER_TARGET}
-	python -m goopy.code_gen ${MODULE_NAME}
+go4py-wrapper: ${PARSER_TARGET}
+	python -m go4py.code_gen ${MODULE_NAME}
 
 # 4. Build final shared library
-c-build: ${GO_TARGET} goopy-wrapper
+c-build: ${GO_TARGET} go4py-wrapper
 	gcc ${CFLAGS} -o ${OUTPUT_FILE} $(wildcard cpython-extention/*.c) ${LDFLAGS} -I${PYTHON_INCLUDE}
 	@echo "Build complete: ${OUTPUT_FILE}"
 
