@@ -1,0 +1,84 @@
+[
+  {
+    "package": "main",
+    "name": "Func_x",
+    "docs": "",
+    "arguments": [],
+    "return_type": [
+      {
+        "go_type": "*C.char"
+      }
+    ]
+  },
+  {
+    "package": "main",
+    "name": "Func_5",
+    "docs": "",
+    "arguments": [],
+    "return_type": [
+      {
+        "go_type": "*C.char"
+      },
+      {
+        "go_type": "*C.char"
+      }
+    ]
+  },
+  {
+    "package": "main",
+    "name": "Func_6",
+    "docs": "",
+    "arguments": [
+      {
+        "name": "a",
+        "type": {
+          "go_type": "string"
+        }
+      }
+    ],
+    "return_type": [
+      {
+        "go_type": "*C.char"
+      }
+    ]
+  },
+  {
+    "package": "main",
+    "name": "Func_8",
+    "docs": "",
+    "arguments": [
+      {
+        "name": "a",
+        "type": {
+          "go_type": "*C.char"
+        }
+      }
+    ],
+    "return_type": []
+  },
+  {
+    "package": "main",
+    "name": "Func_10",
+    "docs": "",
+    "arguments": [],
+    "return_type": [
+      {
+        "go_type": "[]byte"
+      }
+    ]
+  },
+  {
+    "package": "main",
+    "name": "Func_11",
+    "docs": "",
+    "arguments": [],
+    "return_type": [
+      {
+        "go_type": "[]byte"
+      },
+      {
+        "go_type": "[]byte"
+      }
+    ]
+  }
+]

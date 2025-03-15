@@ -101,6 +101,8 @@ static PyObject* test_func_4x(PyObject* self, PyObject* args) {
     PyObject* py_result_r1 = result.r1.data==NULL ? GetPyNone() : PyBytes_FromStringAndSize(result.r1.data, result.r1.len);
     free(result.r1.data);
     PyObject* py_result = Py_BuildValue("OO", py_result_r0, py_result_r1);
+    Py_DECREF(py_result_r0);
+    Py_DECREF(py_result_r1);
     return py_result;
 }"""
 test_cases["str&bytes_tuple_return"] = (fn, fn_res)
@@ -120,6 +122,8 @@ static PyObject* test_func_5(PyObject* self, PyObject* args) {
     PyObject* py_result_r1 = result.r1==NULL ? GetPyNone() : PyUnicode_FromString(result.r1);
     free(result.r1);
     PyObject* py_result = Py_BuildValue("OO", py_result_r0, py_result_r1);
+    Py_DECREF(py_result_r0);
+    Py_DECREF(py_result_r1);
     return py_result;
 }"""
 test_cases["str_tuple_return"] = (fn, fn_res)
@@ -242,6 +246,8 @@ static PyObject* test_func_11(PyObject* self, PyObject* args) {
     PyObject* py_result_r1 = result.r1.data==NULL ? GetPyNone() : PyBytes_FromStringAndSize(result.r1.data, result.r1.len);
     free(result.r1.data);
     PyObject* py_result = Py_BuildValue("OO", py_result_r0, py_result_r1);
+    Py_DECREF(py_result_r0);
+    Py_DECREF(py_result_r1);
     return py_result;
 }"""
 test_cases["byte_tuple_return"] = (fn, fn_res)

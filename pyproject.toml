@@ -18,6 +18,7 @@ dependencies = [
 [dependency-groups]
 dev = [
     "fastapi>=0.115.10",
+    "ipykernel>=6.29.5",
     "ipython>=8.32.0",
     "pyperclip>=1.9.0",
     "pytest>=8.3.5",

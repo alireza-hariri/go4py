@@ -196,6 +196,8 @@ static PyObject* test_func_5(PyObject* self, PyObject* args) {
     }
     free(result.r1.data);
     PyObject* py_result = Py_BuildValue("OO", py_result_r0, py_result_r1);
+    Py_DECREF(py_result_r0);
+    Py_DECREF(py_result_r1);
     return py_result;
 }"""
 test_cases["return_string&byte_slices"] = (fn, fn_res)

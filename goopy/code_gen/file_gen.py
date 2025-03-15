@@ -15,7 +15,7 @@ def template(config: GoopyConfig, functions_code: list, methods: str):
 #include <string.h>
 #include "../artifacts/build/lib{config.module_name}.h"
 
-#defune Py_RETURN_NONE Py_INCREF(Py_None) ; return Py_None
+#define Py_RETURN_NONE Py_INCREF(Py_None) ; return Py_None
 PyObject* GetPyNone() {{
     Py_INCREF(Py_None);
     return Py_None;

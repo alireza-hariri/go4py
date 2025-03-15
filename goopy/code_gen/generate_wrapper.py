@@ -176,6 +176,10 @@ def gen_return_code(fn: GoFunction):
                 else:
                     code += f", {c.return_var()}"
             code += ");"
+            for c in return_converters:
+                if not c.reduceable:
+                    code += f"\n    Py_DECREF({c.py_name});"
+
             code += "\n    return py_result;"
     return code
 
