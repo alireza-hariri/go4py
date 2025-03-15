@@ -5,7 +5,7 @@
 #include <string.h>
 #include "../artifacts/build/libmemLeakTests.h"
 
-#define Py_RETURN_NONE Py_INCREF(Py_None) ; return Py_None
+#define RETURN_NONE Py_INCREF(Py_None) ; return Py_None
 PyObject* GetPyNone() {
     Py_INCREF(Py_None);
     return Py_None;
@@ -48,7 +48,7 @@ static PyObject* memLeakTests_func_8(PyObject* self, PyObject* args) {
     if (!PyArg_ParseTuple(args, "s", &a))
         return NULL;
     Func_8(a);
-    Py_RETURN_NONE;
+    RETURN_NONE;
 }
 
 static PyObject* memLeakTests_func_10(PyObject* self, PyObject* args) { 

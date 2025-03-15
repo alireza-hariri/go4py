@@ -249,6 +249,9 @@ class CStringType(VarType):
     def need_free(self):
         return True
 
+    def cgo_type(self):
+        return "char*"
+
 
 class GoStringType(VarType):
     go_type: Literal["string"] = "string"
@@ -303,25 +306,12 @@ class ByteSliceType(VarType):
         return "GoSlice"
 
 
-class ErrorType(VarType):
-    go_type: Literal["error"] = "error"
-    need_copy: ClassVar[bool] = False
-
-    def c_type(self) -> str:
-        raise NotImplementedError()
-
-    def fmt_str(self) -> str:
-        raise NotImplementedError()
-
-    def set_exeption(self, inp):
-        return f"PyErr_SetString(PyExc_RuntimeError, {inp})"
-
-
 class UnknownType(VarType):
     go_type: str
     need_copy: bool = True
 
-    def c_type(self): ...
+    def c_type(self):
+        raise NotImplementedError()
 
     def fmt_str(self): ...
 
@@ -336,9 +326,12 @@ class UnknownType(VarType):
     def resolve(self):
         """try to convert this type to other types"""
         if self.go_type.startswith("[]"):
-            return SliceType(item_type={"go_type": self.go_type[2:]})
+            t = self.go_type[2:]
+            if t.startswith("(") and t.endswith(")"):
+                t = t[1:-1]
+            return SliceType(item_type={"go_type": t})
         else:
-            raise NotImplementedError()
+            raise CgoLimitationError(f"please check if you can use type: {self.go_type}")
 
 
 SimpleTypes: TypeAlias = (
@@ -348,7 +341,6 @@ SimpleTypes: TypeAlias = (
     | GoStringType
     | CStringType
     | ByteSliceType
-    | ErrorType
     | UnknownType  # Complex Types will fall into this but will be resolved later
 )
 
@@ -377,7 +369,7 @@ class SliceType(VarType):
         return True
 
     def cgo_type(self) -> str:
-        return f"{self.item_type.cgo_type()}*"
+        return "GoSlice"
 
 
 RealType: TypeAlias = SimpleTypes | SliceType

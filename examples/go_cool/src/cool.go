@@ -53,8 +53,8 @@ func MyFunc(a int, b string) [](int) {
 	return []int{1, 2, 3, 4, 5}
 }
 
-//export Randn
-func Randn() float64 {
+//export Randn2
+func Randn2() float64 {
 	return rand.NormFloat64()
 }
 

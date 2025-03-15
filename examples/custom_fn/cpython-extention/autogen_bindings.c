@@ -4,7 +4,13 @@
 #include <Python.h>
 #include <string.h>
 #include "../artifacts/build/libcustom_fn.h"
-#include "./custom.h"
+
+#define RETURN_NONE Py_INCREF(Py_None) ; return Py_None
+PyObject* GetPyNone() {
+    Py_INCREF(Py_None);
+    return Py_None;
+}
+
 
 
 static PyObject* custom_fn_add(PyObject* self, PyObject* args) { 
@@ -22,7 +28,7 @@ static PyObject* custom_fn_getRequest(PyObject* self, PyObject* args) {
         return NULL;
     GoString go_url = {url, (GoInt)strlen(url)};
     char* result = GetRequest(go_url);
-    PyObject* py_result = PyUnicode_FromString(result);
+    PyObject* py_result = result==NULL ? GetPyNone() : PyUnicode_FromString(result);
     free(result);
     return py_result;
 }
@@ -30,7 +36,6 @@ static PyObject* custom_fn_getRequest(PyObject* self, PyObject* args) {
 static PyMethodDef Methods[] = {
     {"add", custom_fn_add, METH_VARARGS, "add"},
     {"getRequest", custom_fn_getRequest, METH_VARARGS, "getRequest"},
-    {"custom_function", custom_function, METH_VARARGS, "custom_function"},
     {NULL, NULL, 0, NULL}
 };
 

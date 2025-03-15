@@ -23,7 +23,7 @@ static PyObject* test_func_1(PyObject* self, PyObject* args) {
     int len = PyList_Size(a);
     long* a_CArray = malloc(len * sizeof(long));
     for (int i = 0; i < len; i++) {
-        PyObject* item = PyList_GetItem(strs, i);
+        PyObject* item = PyList_GetItem(a, i);
         if (!PyLong_Check(item)) {
             PyErr_SetString(PyExc_TypeError, "List items must be PyLong");
             free(a_CArray);
@@ -38,7 +38,7 @@ static PyObject* test_func_1(PyObject* self, PyObject* args) {
     GoSlice go_a = {a_CArray, (GoInt)len, (GoInt)len};
     Func_1(go_a);
     free(a_CArray);
-    Py_RETURN_NONE;
+    RETURN_NONE;
 }"""
 test_cases["int_slice_input"] = (fn, fn_res)
 
@@ -64,7 +64,7 @@ static PyObject* test_func_2(PyObject* self, PyObject* args) {
     int len = PyList_Size(a);
     GoString* a_CArray = malloc(len * sizeof(GoString));
     for (int i = 0; i < len; i++) {
-        PyObject* item = PyList_GetItem(strs, i);
+        PyObject* item = PyList_GetItem(a, i);
         if (!PyUnicode_Check(item)) {
             PyErr_SetString(PyExc_TypeError, "List items must be PyUnicode");
             free(a_CArray);
@@ -86,7 +86,7 @@ static PyObject* test_func_2(PyObject* self, PyObject* args) {
     int len = PyList_Size(b);
     char** b_CArray = malloc(len * sizeof(char*));
     for (int i = 0; i < len; i++) {
-        PyObject* item = PyList_GetItem(strs, i);
+        PyObject* item = PyList_GetItem(b, i);
         if (!PyUnicode_Check(item)) {
             PyErr_SetString(PyExc_TypeError, "List items must be PyUnicode");
             free(a_CArray);
@@ -104,7 +104,7 @@ static PyObject* test_func_2(PyObject* self, PyObject* args) {
     Func_2(go_a,go_b);
     free(a_CArray);
     free(b_CArray);
-    Py_RETURN_NONE;
+    RETURN_NONE;
 }"""
 test_cases["string_slice_inputs"] = (fn, fn_res)
 
@@ -117,7 +117,7 @@ fn = GoFunction(
 )
 fn_res = """
 static PyObject* test_func_3(PyObject* self, PyObject* args) { 
-    long* result = Func_3();
+    GoSlice result = Func_3();
     PyObject* py_result;
     if (result.data == NULL) {
         py_result = GetPyNone();
@@ -142,7 +142,7 @@ fn = GoFunction(
 )
 fn_res = """
 static PyObject* test_func_4(PyObject* self, PyObject* args) { 
-    char** result = Func_4();
+    GoSlice result = Func_4();
     PyObject* py_result;
     if (result.data == NULL) {
         py_result = GetPyNone();

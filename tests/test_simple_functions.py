@@ -47,7 +47,7 @@ static PyObject* test_func_3(PyObject* self, PyObject* args) {
     if (!PyArg_ParseTuple(args, "b", &a))
         return NULL;
     Func_3(a);
-    Py_RETURN_NONE;
+    RETURN_NONE;
 }"""
 test_cases["int8_arg"] = (fn, fn_res)
 
@@ -66,7 +66,7 @@ static PyObject* test_func_4(PyObject* self, PyObject* args) {
         return NULL;
     GoString go_a = {a, (GoInt)strlen(a)};
     Func_4(go_a);
-    Py_RETURN_NONE;
+    RETURN_NONE;
 }"""
 test_cases["string_arg"] = (fn, fn_res)
 
@@ -190,7 +190,7 @@ static PyObject* test_func_8(PyObject* self, PyObject* args) {
     if (!PyArg_ParseTuple(args, "s", &a))
         return NULL;
     Func_8(a);
-    Py_RETURN_NONE;
+    RETURN_NONE;
 }"""
 test_cases["char_ptr_no_return"] = (fn, fn_res)
 
@@ -211,7 +211,7 @@ static PyObject* test_func_9(PyObject* self, PyObject* args) {
     GoInt len = PyBytes_Size(a);
     GoSlice go_a = {PyBytes_AsString(a), len, len};
     Func_9(go_a);
-    Py_RETURN_NONE;
+    RETURN_NONE;
 }"""
 test_cases["bytes_input"] = (fn, fn_res)
 

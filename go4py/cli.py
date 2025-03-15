@@ -1,12 +1,30 @@
+import sys
 import click
 import os
 import subprocess
 from pathlib import Path
 
 from go4py.template_engine import render_template
+from go4py.utils.text_util import print_text_box
 
 HERE = Path(__file__).parent
 TEMPLATE_DIR = HERE / "templates"
+
+
+def find_make_files(build_path):
+    build_path = Path(build_path)
+    if not build_path.exists():
+        click.echo(f"Error: Package directory '{build_path}' does not exist.")
+        sys.exit(1)
+
+    makefiles = ("Makefile", "makefile")
+    if any((build_path / f).exists() for f in makefiles):
+        yield build_path
+    else:
+        for item in build_path.iterdir():
+            if item.is_dir():
+                if any((item / f).exists() for f in makefiles):
+                    yield item
 
 
 @click.group()
@@ -57,29 +75,20 @@ def build(build_path):
     """
     build_path = Path(build_path)
     if not build_path.exists():
-        click.echo(f"Error: Module directory '{build_path}' does not exist.")
+        click.echo(f"Error: Package directory '{build_path}' does not exist.")
         exit(1)
 
-    makefile_path = build_path / "Makefile"
-    if makefile_path.exists():
-        click.echo(f"Building module '{build_path}'...")
-        subprocess.run(["make", "-C", str(build_path), "-j2"])
+    for makepath in find_make_files(build_path):
+        click.echo(f"Building module '{makepath}'...")
+        subprocess.run(["make", "-C", str(makepath), "-j2"])
 
-    else:
-        # Search all directories for Makefiles and build them
-        built_count = 0
-        for item in build_path.iterdir():
-            if item.is_dir():
-                makefile_path = item / "Makefile"
-                if makefile_path.exists():
-                    click.echo(f"Building module in '{item}'...")
-                    subprocess.run(["make", "-C", str(item), "-j2"])
-                    built_count += 1
 
-        if built_count == 0:
-            click.echo("No modules with Makefiles found.")
-        else:
-            click.echo(f"Built {built_count} module(s).")
+@cli.command()
+@click.argument("build_path", required=False, default=".")
+def clean(build_path):
+    """Clean all build artifacts."""
+    for makepath in find_make_files(build_path):
+        subprocess.run(["make", "-C", str(makepath), "clean"])
 
 
 @cli.command()
@@ -96,6 +105,13 @@ def parse(args):
         exit(1)
     cmd = [str(exetutable)] + list(args)
     subprocess.run(cmd)
+
+
+@cli.command()
+@click.argument("text")
+@click.argument("bold_text", default="")
+def textbox(text, bold_text):
+    print_text_box(text, bold_text)
 
 
 if __name__ == "__main__":

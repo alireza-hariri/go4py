@@ -4,7 +4,6 @@ from go4py.types import (
     BoolType,
     ByteSliceType,
     CStringType,
-    ErrorType,
     FloatType,
     GoFunction,
     GoStringType,
@@ -149,7 +148,7 @@ def gen_return_code(fn: GoFunction):
         if type(t) is UnknownType:
             return_types[i] = t.resolve()
     if len(return_types) == 0:
-        code += "\n    Py_RETURN_NONE;"
+        code += "\n    RETURN_NONE;"
     else:
         if len(return_types) == 1:
             conv = ReturnConverter(return_types[0], "result")

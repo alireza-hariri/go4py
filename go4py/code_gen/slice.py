@@ -51,9 +51,9 @@ def go_slice_from_py_list(inp_var: Variable, other_free_code=""):
         return NULL;
     }}
     int len = PyList_Size({name});
-    {inp_var.type.cgo_type()} {name}_CArray = malloc(len * sizeof({inp_var.type.item_type.cgo_type()}));
+    {inp_var.type.item_type.cgo_type()}* {name}_CArray = malloc(len * sizeof({inp_var.type.item_type.cgo_type()}));
     for (int i = 0; i < len; i++) {{
-        PyObject* item = PyList_GetItem(strs, i);
+        PyObject* item = PyList_GetItem({name}, i);
         {item_conv.check_and_convert()}
         {name}_CArray[i] = {item_conv.final_value()};
     }}

@@ -15,7 +15,7 @@ def template(config: go4pyConfig, functions_code: list, methods: str):
 #include <string.h>
 #include "../artifacts/build/lib{config.module_name}.h"
 
-#define Py_RETURN_NONE Py_INCREF(Py_None) ; return Py_None
+#define RETURN_NONE Py_INCREF(Py_None) ; return Py_None
 PyObject* GetPyNone() {{
     Py_INCREF(Py_None);
     return Py_None;
@@ -50,6 +50,9 @@ def gen_binding_file(config: go4pyConfig, functions: list[GoFunction], dest: Pat
             res_functions.append(fn)
         except CgoLimitationError as e:
             print("[cgo limitation]", e, "-> skipping function: ", fn.name)
+            continue
+        except Exception as e:
+            print("[error]", e, "-> skipping function: ", fn.name)
             continue
 
     methods = ""
