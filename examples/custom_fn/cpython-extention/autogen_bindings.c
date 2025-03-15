@@ -4,7 +4,7 @@
 #include <Python.h>
 #include <string.h>
 #include "../artifacts/build/libcustom_fn.h"
-
+#include "./custom.h"
 
 
 static PyObject* custom_fn_add(PyObject* self, PyObject* args) { 
@@ -15,6 +15,7 @@ static PyObject* custom_fn_add(PyObject* self, PyObject* args) {
     long result = Add(a,b);
     return PyLong_FromLong(result);
 }
+
 static PyObject* custom_fn_getRequest(PyObject* self, PyObject* args) { 
     char* url;
     if (!PyArg_ParseTuple(args, "s", &url))
@@ -29,6 +30,7 @@ static PyObject* custom_fn_getRequest(PyObject* self, PyObject* args) {
 static PyMethodDef Methods[] = {
     {"add", custom_fn_add, METH_VARARGS, "add"},
     {"getRequest", custom_fn_getRequest, METH_VARARGS, "getRequest"},
+    {"custom_function", custom_function, METH_VARARGS, "custom_function"},
     {NULL, NULL, 0, NULL}
 };
 

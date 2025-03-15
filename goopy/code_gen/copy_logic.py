@@ -1,5 +1,5 @@
 from goopy.code_gen.slice import go_slice_from_py_list
-from goopy.types import GoStringType, SliceType, Variable
+from goopy.types import ByteSliceType, GoStringType, SliceType, Variable
 
 
 def gen_go_copy(v: Variable, free_logic: str):
@@ -15,6 +15,11 @@ def gen_go_copy(v: Variable, free_logic: str):
             return copy_logic, free_logic
         case SliceType():
             return go_slice_from_py_list(v, free_logic)
+        case ByteSliceType():
+            copy_logic = f"""
+    GoInt len = PyBytes_Size({v.name});
+    GoSlice go_{v.name} = {{PyBytes_AsString({v.name}), len, len}};"""
+            return copy_logic, free_logic
         case _:
             breakpoint()
             raise NotImplementedError()

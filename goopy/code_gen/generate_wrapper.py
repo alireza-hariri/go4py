@@ -1,11 +1,15 @@
 from goopy.code_gen.copy_logic import gen_go_copy
+from goopy.code_gen.slice import indent
 from goopy.types import (
     BoolType,
+    ByteSliceType,
     CStringType,
     ErrorType,
     FloatType,
     GoFunction,
+    GoStringType,
     IntType,
+    SliceType,
     UnknownType,
     VarType,
     Variable,
@@ -60,7 +64,7 @@ def get_return_c_type(fn: GoFunction) -> str:
     if len(fn.return_type) == 0:
         raise Exception("no return type")
     elif len(fn.return_type) == 1:
-        return fn.return_type[0].c_type()
+        return fn.return_type[0].cgo_type()
     else:
         return f"struct {fn.name}_return"
 
@@ -86,15 +90,43 @@ class ReturnConverter:
         else:
             return self.py_name
 
+    def nullable_var(self):
+        T = type(self.t)
+        if T in [SliceType, ByteSliceType]:
+            return f"{self.var}.data"
+        if T == GoStringType:
+            return f"{self.var}.p"
+        if T == CStringType:
+            return self.var
+        return None
+
     def gen_py_result(self):
-        return f"\n    PyObject* {self.py_name} = {self.t.converter(self.var)};"
+        if type(self.t) is SliceType:
+            item_t = self.t.item_type
+            item_converter = ReturnConverter(item_t, "item")
+            return f"""
+    PyObject* {self.py_name};
+    if ({self.nullable_var()} == NULL) {{
+        {self.py_name} = GetPyNone();
+    }} else {{
+        {self.py_name} = PyList_New({self.var}.len);
+        for (int i = 0; i < result.len; i++) {{
+            {item_t.cgo_type()} item = (({item_t.cgo_type()}*){self.var}.data)[i];{indent(item_converter.gen_code(), 8)}
+            PyList_SetItem({self.py_name}, i, {item_converter.return_var()});
+        }}
+    }}"""
+        else:
+            return f"\n    PyObject* {self.py_name} = {self.nullable_var()}==NULL ? GetPyNone() : {self.t.converter(self.var)};"
 
     def gen_copys(self):
         return ""
 
     def gen_free_and_refdec(self):
         if self.t.need_free():
-            return f"\n    free({self.var});"
+            if type(self.t) in [SliceType, ByteSliceType]:
+                return f"\n    free({self.var}.data);"
+            else:
+                return f"\n    free({self.var});"
         else:
             return ""
 
@@ -110,41 +142,40 @@ class ReturnConverter:
 
 def gen_return_code(fn: GoFunction):
     return_types = fn.return_type
-    # if the last element is an error, we should handle it
-    if len(return_types) > 1 and type(return_types[-1]) is ErrorType:
-        return_types = return_types[:-1]
-        err_handling = """
-    if (result.err != nil) {{
-        PyErr_SetString(PyExc_RuntimeError, result.err.Error());
-        return NULL;
-    }}
-"""
-    else:
-        err_handling = ""
-    code = err_handling
 
+    code = ""
+
+    for i, t in enumerate(return_types):
+        if type(t) is UnknownType:
+            return_types[i] = t.resolve()
     if len(return_types) == 0:
-        code += "\n    return Py_None;"
+        code += "\n    Py_RETURN_NONE;"
     else:
         if len(return_types) == 1:
-            if type(fn.return_type[-1]) is ErrorType:
-                conv = ReturnConverter(return_types[0], "result.r0")
-            else:
-                conv = ReturnConverter(return_types[0], "result")
+            conv = ReturnConverter(return_types[0], "result")
             code += conv.gen_code() + f"\n    return {conv.return_var()};"
         else:
             return_converters = [
                 ReturnConverter(t, f"result.r{i}") for i, t in enumerate(return_types)
             ]
-            code = '\n    PyObject* py_result = Py_BuildValue("'
+            code = ""
+            for c in return_converters:
+                # breakpoint()
+                if not c.reduceable:
+                    code += c.gen_code()
+            code += '\n    PyObject* py_result = Py_BuildValue("'
             for t in return_types:
-                code += t.fmt_str()
+                if c.reduceable:
+                    code += t.fmt_str()
+                else:
+                    code += "O"
             code += '"'
             for c in return_converters:
-                code += f", {c.var}"
+                if c.reduceable:
+                    code += f", {c.var}"
+                else:
+                    code += f", {c.return_var()}"
             code += ");"
-            for c in return_converters:
-                code += c.gen_free_and_refdec()
             code += "\n    return py_result;"
     return code
 

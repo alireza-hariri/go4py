@@ -14,8 +14,13 @@ def template(config: GoopyConfig, functions_code: list, methods: str):
 #include <Python.h>
 #include <string.h>
 #include "../artifacts/build/lib{config.module_name}.h"
-{custom_incudes}
 
+#defune Py_RETURN_NONE Py_INCREF(Py_None) ; return Py_None
+PyObject* GetPyNone() {{
+    Py_INCREF(Py_None);
+    return Py_None;
+}}
+{custom_incudes}
 {functions_code}
 
 static PyMethodDef Methods[] = {{{methods}{custom_methods}
@@ -41,7 +46,7 @@ def gen_binding_file(config: GoopyConfig, functions: list[GoFunction], dest: Pat
     res_functions = []
     for fn in functions:
         try:
-            functions_code += gen_fn(fn, module)
+            functions_code += "\n" + gen_fn(fn, module)
             res_functions.append(fn)
         except CgoLimitationError as e:
             print("[cgo limitation]", e, "-> skipping function: ", fn.name)

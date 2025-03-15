@@ -276,32 +276,31 @@ class GoStringType(VarType):
         return "GoString"
 
 
-class BytesType(VarType):
-    go_type: Literal["unsafe.Pointer"] = "unsafe.Pointer"
+class ByteSliceType(VarType):
+    go_type: Literal["[]byte"] = "[]byte"
     need_copy: ClassVar[bool] = True
     size: str | None = None
 
     def c_type(self) -> str:
-        return "void*"
+        return "PyObject*"
 
     def fmt_str(self) -> str:
-        raise NotImplementedError()
+        return "O"
 
     def converter(self, inp):
-        if self.size is None:
-            logger.warning(
-                "Converting cgo unsafe.Pointer to python bytes without knowing its size!! "
-                "(may get trucated on the first zero byte)"
-            )
-            return f"PyBytes_FromString((char*){inp})"
-        else:
-            return NotImplementedError()
+        return f"PyBytes_FromStringAndSize({inp}.data, {inp}.len)"
 
     def from_py_converter(self, inp):
-        return f"PyBytes_AsString({inp})"
+        return NotImplementedError()
+
+    def need_free(self):
+        return True
 
     def check(self, inp):
         return f"PyBytes_Check({inp})"
+
+    def cgo_type(self):
+        return "GoSlice"
 
 
 class ErrorType(VarType):
@@ -338,6 +337,8 @@ class UnknownType(VarType):
         """try to convert this type to other types"""
         if self.go_type.startswith("[]"):
             return SliceType(item_type={"go_type": self.go_type[2:]})
+        else:
+            raise NotImplementedError()
 
 
 SimpleTypes: TypeAlias = (
@@ -346,7 +347,7 @@ SimpleTypes: TypeAlias = (
     | BoolType
     | GoStringType
     | CStringType
-    | BytesType
+    | ByteSliceType
     | ErrorType
     | UnknownType  # Complex Types will fall into this but will be resolved later
 )

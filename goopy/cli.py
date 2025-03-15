@@ -38,7 +38,7 @@ def init(module_name):
         click.echo("Already inside a Go module, skipping 'go mod init'")
 
     # for all files in template folder copy them to the module folder
-    data = {"module_name": module_name}
+    data = {"module_name": module_name.split("/")[-1]}
     for file in TEMPLATE_DIR.iterdir():
         dst_file = module_dir / file.relative_to(TEMPLATE_DIR)
         dst_file.write_text(render_template(file.read_text(), data))

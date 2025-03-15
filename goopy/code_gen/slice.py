@@ -4,7 +4,7 @@ need_c_convert = [GoStringType]
 
 
 def indent(str, indent=4):
-    return "\n".join([indent * " " + line for line in str.split("\n")])
+    return "\n".join([(indent * " " + line) if line else "" for line in str.split("\n")])
 
 
 class ItemConverter:
