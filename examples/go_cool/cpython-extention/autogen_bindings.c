@@ -60,26 +60,8 @@ static PyObject* go_cool_randomString(PyObject* self, PyObject* args) {
     return py_result;
 }
 
-static PyObject* go_cool_myFunc(PyObject* self, PyObject* args) { 
-    long a;
-    char* b;
-    if (!PyArg_ParseTuple(args, "ls", &a, &b))
-        return NULL;
-    GoString go_b = {b, (GoInt)strlen(b)};
-    GoSlice result = MyFunc(a,go_b);
-    PyObject* py_result;
-    if (result.data == NULL) {
-        py_result = GetPyNone();
-    } else {
-        py_result = PyList_New(result.len);
-        for (int i = 0; i < result.len; i++) {
-            long item = ((long*)result.data)[i];
-            PyList_SetItem(py_result, i, PyLong_FromLong(item));
-        }
-    }
-    free(result.data);
-    return py_result;
-}
+// function MyFunc is skipped due to 'skip-binding' annotation
+
 
 static PyObject* go_cool_randn2(PyObject* self, PyObject* args) { 
     double result = Randn2();
@@ -262,7 +244,6 @@ static PyMethodDef Methods[] = {
     {"add", go_cool_add, METH_VARARGS, "add"},
     {"replace", go_cool_replace, METH_VARARGS, "replace"},
     {"randomString", go_cool_randomString, METH_VARARGS, "randomString"},
-    {"myFunc", go_cool_myFunc, METH_VARARGS, "myFunc"},
     {"randn2", go_cool_randn2, METH_VARARGS, "randn2"},
     {"rands", go_cool_rands, METH_VARARGS, "rands"},
     {"cosine", go_cool_cosine, METH_VARARGS, "cosine"},

@@ -92,7 +92,7 @@
   {
     "package": "main",
     "name": "MyFunc",
-    "docs": "",
+    "docs": "[go4py] skip-binding\n",
     "arguments": [
       {
         "name": "a",
@@ -228,7 +228,7 @@
   {
     "package": "main",
     "name": "Map_test2",
-    "docs": "[go4py] msgpack-bytes\n",
+    "docs": "[go4py] msgpack-decode\n",
     "arguments": [],
     "return_type": [
       {

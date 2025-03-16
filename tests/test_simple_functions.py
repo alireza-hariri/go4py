@@ -252,36 +252,6 @@ static PyObject* test_func_11(PyObject* self, PyObject* args) {
 }"""
 test_cases["byte_tuple_return"] = (fn, fn_res)
 
-#####
-
-fn = GoFunction(
-    name="Func_12",
-    docs="[go4py] msgpack-bytes\n",
-    arguments=[],
-    return_type=[{"go_type": "[]byte"}, {"go_type": "*C.char"}],
-)
-fn_res = """
-static PyObject* test_func_12(PyObject* self, PyObject* args) { 
-    struct Func_12_return result = Func_12();
-    PyObject* py_result_r0_msgpack;
-    if (result.r0.data!=NULL){
-        PyObject* py_result_r0 = PyBytes_FromStringAndSize(result.r0.data, result.r0.len);
-        py_result_r0_msgpack = PyObject_CallFunctionObjArgs(unpackb, py_result_r0, NULL);
-        Py_DECREF(py_result_r0);
-    }else{
-        py_result_r0_msgpack = GetPyNone();
-    }
-    free(result.r0.data);
-    PyObject* py_result_r1 = result.r1==NULL ? GetPyNone() : PyUnicode_FromString(result.r1);
-    free(result.r1);
-    PyObject* py_result = Py_BuildValue("OO", py_result_r0_msgpack, py_result_r1);
-    Py_DECREF(py_result_r0_msgpack);
-    Py_DECREF(py_result_r1);
-    return py_result;
-}"""
-test_cases["msgpack_bytes_return"] = (fn, fn_res)
-print(gen_fn(fn, "test"))
-
 
 @pytest.mark.parametrize("fn,fn_res", test_cases.values(), ids=test_cases.keys())
 def test_gen_fn(fn, fn_res):

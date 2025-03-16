@@ -2,8 +2,9 @@ from pydantic import BaseModel
 
 
 class DocAnnots(BaseModel):
-    msgpack_bytes: bool = False
+    msgpack_decode: bool = False
     no_gil: bool = False
+    skip_binding: bool = False
 
 
 def make_doc_annots(doc: str) -> DocAnnots:
@@ -12,17 +13,21 @@ def make_doc_annots(doc: str) -> DocAnnots:
         if "[go4py]" in line:
             args = line.replace("[go4py]", "").strip().split()
             for arg in args:
-                if arg == "msgpack-bytes":
-                    doc_annots.msgpack_bytes = True
+                if arg == "msgpack-decode":
+                    doc_annots.msgpack_decode = True
                 elif arg == "no-gil":
                     doc_annots.no_gil = True
+                elif arg == "skip-binding":
+                    doc_annots.skip_binding = True
+                else:
+                    raise ValueError(f"Unknown go4py annotation: {arg}")
     return doc_annots
 
 
 def test_make_doc_annots():
-    doc = "[go4py]   msgpack-bytes\n"
+    doc = "[go4py]   msgpack-decode\n"
     doc_annots = make_doc_annots(doc)
-    assert doc_annots.msgpack_bytes
+    assert doc_annots.msgpack_decode
 
 
 if __name__ == "__main__":

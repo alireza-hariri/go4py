@@ -48,6 +48,8 @@ func RandomString(n int) *C.char {
 	return C.CString(string(res))
 }
 
+// [go4py] skip-binding
+//
 //export MyFunc
 func MyFunc(a int, b string) [](int) {
 	return []int{1, 2, 3, 4, 5}

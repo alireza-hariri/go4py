@@ -83,7 +83,7 @@ class ReturnConverter:
         self.var = var
         self.py_name = "py_" + var.replace(".", "_")
         self.reduceable = type(t) in [IntType, FloatType, BoolType]
-        self.is_msgpack = (type(t) is ByteSliceType) and doc_annots.msgpack_bytes
+        self.is_msgpack = (type(t) is ByteSliceType) and doc_annots.msgpack_decode
         self.msgpack_name = self.py_name + "_msgpack" if self.is_msgpack else None
 
     def return_var(self):
@@ -155,10 +155,8 @@ class ReturnConverter:
         return result
 
 
-def gen_return_code(fn: GoFunction):
+def gen_return_code(fn: GoFunction, doc_annots: DocAnnots) -> str:
     return_types = fn.return_type
-
-    doc_annots = make_doc_annots(fn.docs)
 
     code = ""
 
@@ -201,13 +199,18 @@ def gen_return_code(fn: GoFunction):
     return code
 
 
-def gen_fn(fn: GoFunction, module_name: str):
+def gen_fn(fn: GoFunction, module_name: str) -> str:
+    doc_annots = fn.doc_annots()
+
+    if doc_annots.skip_binding:
+        return f"\n// function {fn.name} is skipped due to 'skip-binding' annotation\n"
+
     arg_parser = ArgumentParser()
     for arg in fn.arguments:
         if type(arg.type) is UnknownType:
             arg.type = arg.type.resolve()
         arg_parser.addArg(arg)
-    return_code = gen_return_code(fn)
+    return_code = gen_return_code(fn, doc_annots)
 
     return f"""
 static PyObject* {module_name}_{fn.lowercase_name()}(PyObject* self, PyObject* args) {{ {arg_parser.gen_code()}

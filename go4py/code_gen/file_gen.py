@@ -52,7 +52,7 @@ PyMODINIT_FUNC PyInit_{config.module_name}(void) {{
 def gen_binding_file(config: go4pyConfig, functions: list[GoFunction], dest: Path | str):
     module = config.module_name
     functions_code = ""
-    res_functions = []
+    res_functions: list[GoFunction] = []
     for fn in functions:
         try:
             functions_code += "\n" + gen_fn(fn, module)
@@ -66,6 +66,8 @@ def gen_binding_file(config: go4pyConfig, functions: list[GoFunction], dest: Pat
 
     methods = ""
     for fn in res_functions:
+        if fn.doc_annots().skip_binding:
+            continue
         fn_name = fn.lowercase_name()
         methods += f'\n    {{"{fn_name}", {module}_{fn_name}, METH_VARARGS, "{fn_name}"}},'
     os.makedirs(os.path.dirname(dest), exist_ok=True)

@@ -4,6 +4,8 @@ from typing import ClassVar, Literal, TypeAlias
 from abc import ABC, abstractmethod
 import logging
 
+from go4py.doc_annotation import DocAnnots, make_doc_annots
+
 logger = logging.getLogger(__name__)
 
 
@@ -392,3 +394,6 @@ class GoFunction(BaseModel):
 
     def lowercase_name(self) -> str:
         return self.name.lower()[0] + self.name[1:]
+
+    def doc_annots(self) -> DocAnnots:
+        return make_doc_annots(self.docs)

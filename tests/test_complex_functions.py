@@ -70,7 +70,7 @@ static PyObject* test_func_2(PyObject* self, PyObject* args) {
             free(a_CArray);
             return NULL;
         }
-        char* c_item = PyUnicode_AsUTF8(item);
+        const char* c_item = PyUnicode_AsUTF8(item);
         a_CArray[i] = (GoString) {c_item, (GoInt)strlen(c_item)};
     }
     if (PyErr_Occurred()) {

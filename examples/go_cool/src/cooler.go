@@ -67,7 +67,7 @@ func alaki() (*C.char, int) {
 	return C.CString("hello"), 5
 }
 
-// [go4py] msgpack-bytes
+// [go4py] msgpack-decode
 //
 //export Map_test2
 func Map_test2() ([]byte, *C.char) {
