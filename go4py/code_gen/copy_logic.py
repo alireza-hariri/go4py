@@ -17,8 +17,8 @@ def gen_go_copy(v: Variable, free_logic: str):
             return go_slice_from_py_list(v, free_logic)
         case ByteSliceType():
             copy_logic = f"""
-    GoInt len = PyBytes_Size({v.name});
-    GoSlice go_{v.name} = {{PyBytes_AsString({v.name}), len, len}};"""
+    GoInt len_{v.name} = PyBytes_Size({v.name});
+    GoSlice go_{v.name} = {{PyBytes_AsString({v.name}), len_{v.name}, len_{v.name}}};"""
             return copy_logic, free_logic
         case _:
             breakpoint()

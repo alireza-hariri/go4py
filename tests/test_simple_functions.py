@@ -208,8 +208,8 @@ static PyObject* test_func_9(PyObject* self, PyObject* args) {
     PyObject* a;
     if (!PyArg_ParseTuple(args, "O", &a))
         return NULL;
-    GoInt len = PyBytes_Size(a);
-    GoSlice go_a = {PyBytes_AsString(a), len, len};
+    GoInt len_a = PyBytes_Size(a);
+    GoSlice go_a = {PyBytes_AsString(a), len_a, len_a};
     Func_9(go_a);
     RETURN_NONE;
 }"""

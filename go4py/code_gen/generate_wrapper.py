@@ -119,7 +119,7 @@ class ReturnConverter:
         {self.py_name} = GetPyNone();
     }} else {{
         {self.py_name} = PyList_New({self.var}.len);
-        for (int i = 0; i < result.len; i++) {{
+        for (int i = 0; i < {self.var}.len; i++) {{
             {item_t.cgo_type()} item = (({item_t.cgo_type()}*){self.var}.data)[i];{indent(item_converter.gen_code(), 8)}
             PyList_SetItem({self.py_name}, i, {item_converter.return_var()});
         }}

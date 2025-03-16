@@ -20,9 +20,9 @@ static PyObject* test_func_1(PyObject* self, PyObject* args) {
         PyErr_SetString(PyExc_TypeError, "Argument a must be a list");
         return NULL;
     }
-    int len = PyList_Size(a);
-    long* a_CArray = malloc(len * sizeof(long));
-    for (int i = 0; i < len; i++) {
+    int len_a = PyList_Size(a);
+    long* a_CArray = malloc(len_a * sizeof(long));
+    for (int i = 0; i < len_a; i++) {
         PyObject* item = PyList_GetItem(a, i);
         if (!PyLong_Check(item)) {
             PyErr_SetString(PyExc_TypeError, "List items must be PyLong");
@@ -35,7 +35,7 @@ static PyObject* test_func_1(PyObject* self, PyObject* args) {
         free(a_CArray);
         return NULL;
     }
-    GoSlice go_a = {a_CArray, (GoInt)len, (GoInt)len};
+    GoSlice go_a = {a_CArray, (GoInt)len_a, (GoInt)len_a};
     Func_1(go_a);
     free(a_CArray);
     RETURN_NONE;
@@ -61,9 +61,9 @@ static PyObject* test_func_2(PyObject* self, PyObject* args) {
         PyErr_SetString(PyExc_TypeError, "Argument a must be a list");
         return NULL;
     }
-    int len = PyList_Size(a);
-    GoString* a_CArray = malloc(len * sizeof(GoString));
-    for (int i = 0; i < len; i++) {
+    int len_a = PyList_Size(a);
+    GoString* a_CArray = malloc(len_a * sizeof(GoString));
+    for (int i = 0; i < len_a; i++) {
         PyObject* item = PyList_GetItem(a, i);
         if (!PyUnicode_Check(item)) {
             PyErr_SetString(PyExc_TypeError, "List items must be PyUnicode");
@@ -77,15 +77,15 @@ static PyObject* test_func_2(PyObject* self, PyObject* args) {
         free(a_CArray);
         return NULL;
     }
-    GoSlice go_a = {a_CArray, (GoInt)len, (GoInt)len};
+    GoSlice go_a = {a_CArray, (GoInt)len_a, (GoInt)len_a};
     if (!PyList_Check(b)) {
         PyErr_SetString(PyExc_TypeError, "Argument b must be a list");
         free(a_CArray);
         return NULL;
     }
-    int len = PyList_Size(b);
-    char** b_CArray = malloc(len * sizeof(char*));
-    for (int i = 0; i < len; i++) {
+    int len_b = PyList_Size(b);
+    char** b_CArray = malloc(len_b * sizeof(char*));
+    for (int i = 0; i < len_b; i++) {
         PyObject* item = PyList_GetItem(b, i);
         if (!PyUnicode_Check(item)) {
             PyErr_SetString(PyExc_TypeError, "List items must be PyUnicode");
@@ -100,7 +100,7 @@ static PyObject* test_func_2(PyObject* self, PyObject* args) {
         free(b_CArray);
         return NULL;
     }
-    GoSlice go_b = {b_CArray, (GoInt)len, (GoInt)len};
+    GoSlice go_b = {b_CArray, (GoInt)len_b, (GoInt)len_b};
     Func_2(go_a,go_b);
     free(a_CArray);
     free(b_CArray);
@@ -174,7 +174,7 @@ static PyObject* test_func_5(PyObject* self, PyObject* args) {
         py_result_r0 = GetPyNone();
     } else {
         py_result_r0 = PyList_New(result.r0.len);
-        for (int i = 0; i < result.len; i++) {
+        for (int i = 0; i < result.r0.len; i++) {
             GoSlice item = ((GoSlice*)result.r0.data)[i];
             PyObject* py_item = item.data==NULL ? GetPyNone() : PyBytes_FromStringAndSize(item.data, item.len);
             free(item.data);
@@ -187,7 +187,7 @@ static PyObject* test_func_5(PyObject* self, PyObject* args) {
         py_result_r1 = GetPyNone();
     } else {
         py_result_r1 = PyList_New(result.r1.len);
-        for (int i = 0; i < result.len; i++) {
+        for (int i = 0; i < result.r1.len; i++) {
             char* item = ((char**)result.r1.data)[i];
             PyObject* py_item = item==NULL ? GetPyNone() : PyUnicode_FromString(item);
             free(item);

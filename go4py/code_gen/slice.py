@@ -25,6 +25,12 @@ class ItemConverter:
             c_type = "const char*"
         return c_type
 
+    def item_cgo_type(self):
+        cgo_type = self.t.cgo_type()
+        if cgo_type == "char*":
+            cgo_type = "const char*"
+        return cgo_type
+
     def check_and_convert(self):
         pytype = self.t.check("").split("_Check")[0]  # TODO: this is hacky fix it
         result = f"""if (!{self.t.check(self.name)}) {{
@@ -56,9 +62,9 @@ def go_slice_from_py_list(inp_var: Variable, other_free_code=""):
         PyErr_SetString(PyExc_TypeError, "Argument {name} must be a list");{indent(other_free_code)}
         return NULL;
     }}
-    int len = PyList_Size({name});
-    {inp_var.type.item_type.cgo_type()}* {name}_CArray = malloc(len * sizeof({inp_var.type.item_type.cgo_type()}));
-    for (int i = 0; i < len; i++) {{
+    int len_{name} = PyList_Size({name});
+    {item_conv.item_cgo_type()}* {name}_CArray = malloc(len_{name} * sizeof({inp_var.type.item_type.cgo_type()}));
+    for (int i = 0; i < len_{name}; i++) {{
         PyObject* item = PyList_GetItem({name}, i);
         {item_conv.check_and_convert()}
         {name}_CArray[i] = {item_conv.final_value()};
@@ -66,5 +72,5 @@ def go_slice_from_py_list(inp_var: Variable, other_free_code=""):
     if (PyErr_Occurred()) {{{indent(free_logic)}
         return NULL;
     }}
-    GoSlice go_{name} = {{{name}_CArray, (GoInt)len, (GoInt)len}};"""
+    GoSlice go_{name} = {{{name}_CArray, (GoInt)len_{name}, (GoInt)len_{name}}};"""
     return copy_logic, free_logic

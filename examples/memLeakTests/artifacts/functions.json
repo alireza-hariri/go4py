@@ -1,6 +1,76 @@
 [
   {
     "package": "main",
+    "name": "Func_1",
+    "docs": "",
+    "arguments": [
+      {
+        "name": "a",
+        "type": {
+          "go_type": "[]int"
+        }
+      }
+    ],
+    "return_type": []
+  },
+  {
+    "package": "main",
+    "name": "Func_2",
+    "docs": "",
+    "arguments": [
+      {
+        "name": "a",
+        "type": {
+          "go_type": "[]string"
+        }
+      },
+      {
+        "name": "b",
+        "type": {
+          "go_type": "[]*C.char"
+        }
+      }
+    ],
+    "return_type": []
+  },
+  {
+    "package": "main",
+    "name": "Func_3",
+    "docs": "",
+    "arguments": [],
+    "return_type": [
+      {
+        "go_type": "[]int"
+      }
+    ]
+  },
+  {
+    "package": "main",
+    "name": "Func_4",
+    "docs": "",
+    "arguments": [],
+    "return_type": [
+      {
+        "go_type": "[]*C.char"
+      }
+    ]
+  },
+  {
+    "package": "main",
+    "name": "Func_5_2",
+    "docs": "",
+    "arguments": [],
+    "return_type": [
+      {
+        "go_type": "[][]byte"
+      },
+      {
+        "go_type": "[]*C.char"
+      }
+    ]
+  },
+  {
+    "package": "main",
     "name": "Func_x",
     "docs": "",
     "arguments": [],
