@@ -78,12 +78,12 @@ def gen_fn_call(fn: GoFunction):
 
 
 class ReturnConverter:
-    def __init__(self, t: VarType, doc_annots: DocAnnots, var="result"):
+    def __init__(self, t: VarType, msgpack_decode: False, var="result"):
         self.t = t
         self.var = var
         self.py_name = "py_" + var.replace(".", "_")
         self.reduceable = type(t) in [IntType, FloatType, BoolType]
-        self.is_msgpack = (type(t) is ByteSliceType) and doc_annots.msgpack_decode
+        self.is_msgpack = (type(t) is ByteSliceType) and msgpack_decode
         self.msgpack_name = self.py_name + "_msgpack" if self.is_msgpack else None
 
     def return_var(self):
@@ -107,7 +107,7 @@ class ReturnConverter:
     def gen_py_result(self):
         if type(self.t) is SliceType:
             item_t = self.t.item_type
-            item_converter = ReturnConverter(item_t, DocAnnots(), "item")
+            item_converter = ReturnConverter(item_t, False, "item")
             return f"""
     PyObject* {self.py_name};
     if ({self.nullable_var()} == NULL) {{
@@ -166,12 +166,14 @@ def gen_return_code(fn: GoFunction, doc_annots: DocAnnots) -> str:
     if len(return_types) == 0:
         code += "\n    RETURN_NONE;"
     else:
+        msgpack_decode = doc_annots.msgpack_decode
         if len(return_types) == 1:
-            conv = ReturnConverter(return_types[0], doc_annots, "result")
+            conv = ReturnConverter(return_types[0], msgpack_decode, "result")
             code += conv.gen_code() + f"\n    return {conv.return_var()};"
         else:
             return_converters = [
-                ReturnConverter(t, doc_annots, f"result.r{i}") for i, t in enumerate(return_types)
+                ReturnConverter(t, msgpack_decode, f"result.r{i}")
+                for i, t in enumerate(return_types)
             ]
             code = ""
             for c in return_converters:
