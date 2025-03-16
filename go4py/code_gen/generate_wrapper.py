@@ -69,12 +69,17 @@ def get_return_c_type(fn: GoFunction) -> str:
         return f"struct {fn.name}_return"
 
 
-def gen_fn_call(fn: GoFunction):
+def gen_fn_call(fn: GoFunction, doc_annots: DocAnnots):
     args = [("go_" + a.name if a.type.need_copy else a.name) for a in fn.arguments]
-    if len(fn.return_type) == 0:
-        return f"    {fn.name}({','.join(args)});"
+    if doc_annots.no_gil:
+        before = "    Py_BEGIN_ALLOW_THREADS\n"
+        after = "\n    Py_END_ALLOW_THREADS"
     else:
-        return f"    {get_return_c_type(fn)} result = {fn.name}({','.join(args)});"
+        before = after = ""
+    if len(fn.return_type) == 0:
+        return f"{before}    {fn.name}({','.join(args)});{after}"
+    else:
+        return f"{before}    {get_return_c_type(fn)} result = {fn.name}({','.join(args)});{after}"
 
 
 class ReturnConverter:
@@ -216,5 +221,5 @@ def gen_fn(fn: GoFunction, module_name: str) -> str:
 
     return f"""
 static PyObject* {module_name}_{fn.lowercase_name()}(PyObject* self, PyObject* args) {{ {arg_parser.gen_code()}
-{gen_fn_call(fn)}{arg_parser.free_logic}{return_code}
+{gen_fn_call(fn, doc_annots)}{arg_parser.free_logic}{return_code}
 }}"""

@@ -39,8 +39,27 @@ fn = GoFunction(
     return_type=[{"go_type": "[]byte"}, {"go_type": "*C.char"}],
 )
 fn_res = "\n// function Func_13 is skipped due to 'skip-binding' annotation\n"
-test_cases["msgpack_decode_return"] = (fn, fn_res)
+test_cases["skip-binding"] = (fn, fn_res)
 
+fn = GoFunction(
+    name="Func_14",
+    docs="[go4py] no-gil\n",
+    arguments=[{"name": "arg0", "type": {"go_type": "int"}}],
+    return_type=[{"go_type": "[]byte"}],
+)
+fn_res = """
+static PyObject* test_func_14(PyObject* self, PyObject* args) { 
+    long arg0;
+    if (!PyArg_ParseTuple(args, "l", &arg0))
+        return NULL;
+    Py_BEGIN_ALLOW_THREADS
+    GoSlice result = Func_14(arg0);
+    Py_END_ALLOW_THREADS
+    PyObject* py_result = result.data==NULL ? GetPyNone() : PyBytes_FromStringAndSize(result.data, result.len);
+    free(result.data);
+    return py_result;
+}"""
+test_cases["no-gil"] = (fn, fn_res)
 
 print(gen_fn(fn, "test"))
 
