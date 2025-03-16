@@ -11,6 +11,9 @@ import (
 	"strconv"
 	"time"
 	"unsafe"
+
+	"github.com/alireza-hariri/go4py/go_pkg/go4py"
+	"github.com/vmihailenco/msgpack"
 )
 
 //export Cosine
@@ -64,19 +67,21 @@ func alaki() (*C.char, int) {
 	return C.CString("hello"), 5
 }
 
-// //export Map_test2
-// func Map_test2() (unsafe.Pointer, int) {
-// 	_map := map[string]string{"hello": "world", "example": "example"}
+// [go4py] msgpack-bytes
+//
+//export Map_test2
+func Map_test2() ([]byte, *C.char) {
+	_map := map[string]string{"hello": "world", "example": "example"}
 
-// 	b, err := msgpack.Marshal(_map)
+	b, err := msgpack.Marshal(_map)
 
-// 	if err != nil {
-// 		fmt.Println(err)
-// 		return nil, 0
-// 	}
-// 	// fmt.Println(b)
-// 	return C.CBytes(b), len(b)
-// }
+	if err != nil {
+		fmt.Println(err)
+		return nil, C.CString("error in marshaling")
+	}
+	// fmt.Println(b)
+	return go4py.CopySlice(b), nil
+}
 
 //export Slice_inp_test
 func Slice_inp_test(nums []int) {

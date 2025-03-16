@@ -19,6 +19,12 @@ class ItemConverter:
         self.name = item_name
         self.free_resource_code = indent(free_resource_code, 8)
 
+    def item_c_type(self):
+        c_type = self.t.c_type()
+        if c_type == "char*":
+            c_type = "const char*"
+        return c_type
+
     def check_and_convert(self):
         pytype = self.t.check("").split("_Check")[0]  # TODO: this is hacky fix it
         result = f"""if (!{self.t.check(self.name)}) {{
@@ -26,7 +32,7 @@ class ItemConverter:
             return NULL;
         }}"""
         if self.t.need_copy:
-            result += f"\n        {self.t.c_type()} c_{self.name} = {self.t.from_py_converter(self.name)};"
+            result += f"\n        {self.item_c_type()} c_{self.name} = {self.t.from_py_converter(self.name)};"
         return result
 
     def final_value(self):

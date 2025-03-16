@@ -1,5 +1,6 @@
 from go4py.code_gen.copy_logic import gen_go_copy
 from go4py.code_gen.slice import indent
+from go4py.doc_annotation import DocAnnots, make_doc_annots
 from go4py.types import (
     BoolType,
     ByteSliceType,
@@ -77,15 +78,19 @@ def gen_fn_call(fn: GoFunction):
 
 
 class ReturnConverter:
-    def __init__(self, t: VarType, var="result"):
+    def __init__(self, t: VarType, doc_annots: DocAnnots, var="result"):
         self.t = t
         self.var = var
         self.py_name = "py_" + var.replace(".", "_")
         self.reduceable = type(t) in [IntType, FloatType, BoolType]
+        self.is_msgpack = (type(t) is ByteSliceType) and doc_annots.msgpack_bytes
+        self.msgpack_name = self.py_name + "_msgpack" if self.is_msgpack else None
 
     def return_var(self):
         if self.reduceable:
             return self.t.converter(self.var)
+        elif self.is_msgpack:
+            return self.msgpack_name
         else:
             return self.py_name
 
@@ -102,7 +107,7 @@ class ReturnConverter:
     def gen_py_result(self):
         if type(self.t) is SliceType:
             item_t = self.t.item_type
-            item_converter = ReturnConverter(item_t, "item")
+            item_converter = ReturnConverter(item_t, DocAnnots(), "item")
             return f"""
     PyObject* {self.py_name};
     if ({self.nullable_var()} == NULL) {{
@@ -114,6 +119,17 @@ class ReturnConverter:
             PyList_SetItem({self.py_name}, i, {item_converter.return_var()});
         }}
     }}"""
+        elif self.is_msgpack:
+            return f"""
+    PyObject* {self.msgpack_name};
+    if ({self.var}.data!=NULL){{
+        PyObject* {self.py_name} = PyBytes_FromStringAndSize({self.var}.data, {self.var}.len);
+        {self.msgpack_name} = PyObject_CallFunctionObjArgs(unpackb, {self.py_name}, NULL);
+        Py_DECREF({self.py_name});
+    }}else{{
+        {self.msgpack_name} = GetPyNone();
+    }}"""
+
         else:
             return f"\n    PyObject* {self.py_name} = {self.nullable_var()}==NULL ? GetPyNone() : {self.t.converter(self.var)};"
 
@@ -142,6 +158,8 @@ class ReturnConverter:
 def gen_return_code(fn: GoFunction):
     return_types = fn.return_type
 
+    doc_annots = make_doc_annots(fn.docs)
+
     code = ""
 
     for i, t in enumerate(return_types):
@@ -151,11 +169,11 @@ def gen_return_code(fn: GoFunction):
         code += "\n    RETURN_NONE;"
     else:
         if len(return_types) == 1:
-            conv = ReturnConverter(return_types[0], "result")
+            conv = ReturnConverter(return_types[0], doc_annots, "result")
             code += conv.gen_code() + f"\n    return {conv.return_var()};"
         else:
             return_converters = [
-                ReturnConverter(t, f"result.r{i}") for i, t in enumerate(return_types)
+                ReturnConverter(t, doc_annots, f"result.r{i}") for i, t in enumerate(return_types)
             ]
             code = ""
             for c in return_converters:
@@ -177,7 +195,7 @@ def gen_return_code(fn: GoFunction):
             code += ");"
             for c in return_converters:
                 if not c.reduceable:
-                    code += f"\n    Py_DECREF({c.py_name});"
+                    code += f"\n    Py_DECREF({c.return_var()});"
 
             code += "\n    return py_result;"
     return code

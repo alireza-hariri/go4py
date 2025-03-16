@@ -227,6 +227,20 @@
   },
   {
     "package": "main",
+    "name": "Map_test2",
+    "docs": "[go4py] msgpack-bytes\n",
+    "arguments": [],
+    "return_type": [
+      {
+        "go_type": "[]byte"
+      },
+      {
+        "go_type": "*C.char"
+      }
+    ]
+  },
+  {
+    "package": "main",
     "name": "Slice_inp_test",
     "docs": "",
     "arguments": [

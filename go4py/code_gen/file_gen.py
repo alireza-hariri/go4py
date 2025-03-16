@@ -14,13 +14,15 @@ def template(config: go4pyConfig, functions_code: list, methods: str):
 #include <Python.h>
 #include <string.h>
 #include "../artifacts/build/lib{config.module_name}.h"
+{custom_incudes}
 
 #define RETURN_NONE Py_INCREF(Py_None) ; return Py_None
 PyObject* GetPyNone() {{
     Py_INCREF(Py_None);
     return Py_None;
 }}
-{custom_incudes}
+
+PyObject* unpackb;
 {functions_code}
 
 static PyMethodDef Methods[] = {{{methods}{custom_methods}
@@ -35,6 +37,13 @@ static struct PyModuleDef {config.module_name}_module = {{
     Methods
 }};
 PyMODINIT_FUNC PyInit_{config.module_name}(void) {{
+    PyObject* msgpack = PyImport_ImportModule("msgpack");
+    if (msgpack == NULL) {{
+       PyErr_SetString(PyExc_ImportError, "msgpack module not found");
+        return NULL;
+    }}
+    unpackb = PyObject_GetAttrString(msgpack, "unpackb");
+
     return PyModule_Create(&{config.module_name}_module);
 }}
 """
