@@ -64,6 +64,7 @@ for go_fn, py_fn in pairs:
     print(go_fn.__name__, py_fn.__name__)
     t1 = timeit.timeit(go_fn, number=100000)
     t2 = timeit.timeit(py_fn, number=100000)
+    print((t2 - t1) / 100000)
     print(f"go4py speedup {t2 / t1:.1f}x\n")
 
 
@@ -83,6 +84,7 @@ for a in arg:
         print(py_fn.__name__, f"a={a}")
         t1 = timeit.timeit(lambda: go_fn(a), number=10000)
         t2 = timeit.timeit(lambda: py_fn(a), number=10000)
+        print((t2 - t1) / 10000)
         print(f"go4py speedup {t2 / t1:.1f}x\n")
 
 
