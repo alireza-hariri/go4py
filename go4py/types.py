@@ -214,10 +214,10 @@ class BoolType(VarType):
     need_copy: ClassVar[bool] = False
 
     def c_type(self) -> str:
-        return "char"
+        return "int"
 
     def fmt_str(self) -> str:
-        return "d"
+        return "p"
 
     def converter(self, inp):
         return f"PyBool_FromLong({inp})"

@@ -5,12 +5,14 @@
 #include <string.h>
 #include "../artifacts/build/libcustom_fn.h"
 
+
 #define RETURN_NONE Py_INCREF(Py_None) ; return Py_None
 PyObject* GetPyNone() {
     Py_INCREF(Py_None);
     return Py_None;
 }
 
+PyObject* unpackb;
 
 
 static PyObject* custom_fn_add(PyObject* self, PyObject* args) { 
@@ -47,5 +49,12 @@ static struct PyModuleDef custom_fn_module = {
     Methods
 };
 PyMODINIT_FUNC PyInit_custom_fn(void) {
+    PyObject* msgpack = PyImport_ImportModule("msgpack");
+    if (msgpack == NULL) {
+       PyErr_SetString(PyExc_ImportError, "msgpack module not found");
+        return NULL;
+    }
+    unpackb = PyObject_GetAttrString(msgpack, "unpackb");
+
     return PyModule_Create(&custom_fn_module);
 }

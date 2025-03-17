@@ -159,9 +159,9 @@ static PyObject* go_cool_slice_inp_test(PyObject* self, PyObject* args) {
         PyErr_SetString(PyExc_TypeError, "Argument nums must be a list");
         return NULL;
     }
-    int len = PyList_Size(nums);
-    long* nums_CArray = malloc(len * sizeof(long));
-    for (int i = 0; i < len; i++) {
+    int len_nums = PyList_Size(nums);
+    long* nums_CArray = malloc(len_nums * sizeof(long));
+    for (int i = 0; i < len_nums; i++) {
         PyObject* item = PyList_GetItem(nums, i);
         if (!PyLong_Check(item)) {
             PyErr_SetString(PyExc_TypeError, "List items must be PyLong");
@@ -174,7 +174,7 @@ static PyObject* go_cool_slice_inp_test(PyObject* self, PyObject* args) {
         free(nums_CArray);
         return NULL;
     }
-    GoSlice go_nums = {nums_CArray, (GoInt)len, (GoInt)len};
+    GoSlice go_nums = {nums_CArray, (GoInt)len_nums, (GoInt)len_nums};
     Slice_inp_test(go_nums);
     free(nums_CArray);
     RETURN_NONE;
@@ -188,9 +188,9 @@ static PyObject* go_cool_someFunc(PyObject* self, PyObject* args) {
         PyErr_SetString(PyExc_TypeError, "Argument nums must be a list");
         return NULL;
     }
-    int len = PyList_Size(nums);
-    long* nums_CArray = malloc(len * sizeof(long));
-    for (int i = 0; i < len; i++) {
+    int len_nums = PyList_Size(nums);
+    long* nums_CArray = malloc(len_nums * sizeof(long));
+    for (int i = 0; i < len_nums; i++) {
         PyObject* item = PyList_GetItem(nums, i);
         if (!PyLong_Check(item)) {
             PyErr_SetString(PyExc_TypeError, "List items must be PyLong");
@@ -203,7 +203,7 @@ static PyObject* go_cool_someFunc(PyObject* self, PyObject* args) {
         free(nums_CArray);
         return NULL;
     }
-    GoSlice go_nums = {nums_CArray, (GoInt)len, (GoInt)len};
+    GoSlice go_nums = {nums_CArray, (GoInt)len_nums, (GoInt)len_nums};
     SomeFunc(go_nums);
     free(nums_CArray);
     RETURN_NONE;
@@ -217,9 +217,9 @@ static PyObject* go_cool_someFunc2(PyObject* self, PyObject* args) {
         PyErr_SetString(PyExc_TypeError, "Argument nums must be a list");
         return NULL;
     }
-    int len = PyList_Size(nums);
-    GoString* nums_CArray = malloc(len * sizeof(GoString));
-    for (int i = 0; i < len; i++) {
+    int len_nums = PyList_Size(nums);
+    GoString* nums_CArray = malloc(len_nums * sizeof(GoString));
+    for (int i = 0; i < len_nums; i++) {
         PyObject* item = PyList_GetItem(nums, i);
         if (!PyUnicode_Check(item)) {
             PyErr_SetString(PyExc_TypeError, "List items must be PyUnicode");
@@ -233,7 +233,7 @@ static PyObject* go_cool_someFunc2(PyObject* self, PyObject* args) {
         free(nums_CArray);
         return NULL;
     }
-    GoSlice go_nums = {nums_CArray, (GoInt)len, (GoInt)len};
+    GoSlice go_nums = {nums_CArray, (GoInt)len_nums, (GoInt)len_nums};
     SomeFunc2(go_nums);
     free(nums_CArray);
     RETURN_NONE;

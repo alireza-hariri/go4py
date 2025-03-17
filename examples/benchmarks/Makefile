@@ -2,7 +2,7 @@
 .PHONY: clean go4py-wrapper c-build
 
 # Configuration variables
-MODULE_NAME := {{ module_name }}
+MODULE_NAME := benchmarks
 BUILD_DIR := ./artifacts/build
 ARTIFACTS_DIR := ./artifacts
 
@@ -11,7 +11,6 @@ PARSER_TARGET := ${ARTIFACTS_DIR}/functions.json
 OUTPUT_FILE := __init__.so
 
 PYTHON_INCLUDE=/usr/include/python3.13
-export PYTHONPATH=..
 
 CFLAGS := -shared -fPIC
 LDFLAGS := -L${BUILD_DIR} -l${MODULE_NAME}
@@ -47,4 +46,4 @@ c-build: ${GO_TARGET} go4py-wrapper
 
 # Clean build artifacts
 clean:
-	rm -rf ${BUILD_DIR} ./*.so
+	rm -rf ${ARTIFACTS_DIR} ./*.so

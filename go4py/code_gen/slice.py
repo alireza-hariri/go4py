@@ -1,4 +1,4 @@
-from go4py.types import Variable, VarType, GoStringType
+from go4py.types import UnknownType, Variable, VarType, GoStringType
 
 need_c_convert = [GoStringType]
 
@@ -16,6 +16,8 @@ class ItemConverter:
         # indent = 0,
     ):
         self.t = item_type
+        if type(self.t) is UnknownType:
+            self.t = self.t.resolve()
         self.name = item_name
         self.free_resource_code = indent(free_resource_code, 8)
 

@@ -1,5 +1,5 @@
 from go4py.code_gen.slice import go_slice_from_py_list
-from go4py.types import ByteSliceType, GoStringType, SliceType, Variable
+from go4py.types import ByteSliceType, GoStringType, SliceType, UnknownType, Variable
 
 
 def gen_go_copy(v: Variable, free_logic: str):
@@ -14,6 +14,8 @@ def gen_go_copy(v: Variable, free_logic: str):
     GoString go_{v.name} = {{{v.name}, (GoInt)strlen({v.name})}};"""
             return copy_logic, free_logic
         case SliceType():
+            if type(v.type.item_type) is UnknownType:
+                raise Exception("Nested types are not supported! (except for [][]byte)")
             return go_slice_from_py_list(v, free_logic)
         case ByteSliceType():
             copy_logic = f"""
@@ -21,5 +23,4 @@ def gen_go_copy(v: Variable, free_logic: str):
     GoSlice go_{v.name} = {{PyBytes_AsString({v.name}), len_{v.name}, len_{v.name}}};"""
             return copy_logic, free_logic
         case _:
-            breakpoint()
             raise NotImplementedError()

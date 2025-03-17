@@ -57,9 +57,11 @@ def init(module_name):
 
     # for all files in template folder copy them to the module folder
     data = {"module_name": module_name.split("/")[-1]}
-    for file in TEMPLATE_DIR.iterdir():
-        dst_file = module_dir / file.relative_to(TEMPLATE_DIR)
-        dst_file.write_text(render_template(file.read_text(), data))
+    for file in TEMPLATE_DIR.rglob("*"):
+        if file.is_file():
+            dst_file = module_dir / file.relative_to(TEMPLATE_DIR)
+            dst_file.parent.mkdir(parents=True, exist_ok=True)
+            dst_file.write_text(render_template(file.read_text(), data))
 
     # print a message
     click.echo(f"Module {module_name} initialized.")

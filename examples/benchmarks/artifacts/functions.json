@@ -1,0 +1,141 @@
+[
+  {
+    "package": "main",
+    "name": "Add",
+    "docs": "",
+    "arguments": [
+      {
+        "name": "a",
+        "type": {
+          "go_type": "int"
+        }
+      }
+    ],
+    "return_type": [
+      {
+        "go_type": "int"
+      }
+    ]
+  },
+  {
+    "package": "main",
+    "name": "Rand",
+    "docs": "",
+    "arguments": [],
+    "return_type": [
+      {
+        "go_type": "float64"
+      }
+    ]
+  },
+  {
+    "package": "main",
+    "name": "Randn",
+    "docs": "",
+    "arguments": [],
+    "return_type": [
+      {
+        "go_type": "float64"
+      }
+    ]
+  },
+  {
+    "package": "main",
+    "name": "RandArray",
+    "docs": "",
+    "arguments": [
+      {
+        "name": "n",
+        "type": {
+          "go_type": "int"
+        }
+      }
+    ],
+    "return_type": [
+      {
+        "go_type": "[]float64"
+      }
+    ]
+  },
+  {
+    "package": "main",
+    "name": "GetRequest",
+    "docs": "",
+    "arguments": [
+      {
+        "name": "url",
+        "type": {
+          "go_type": "string"
+        }
+      }
+    ],
+    "return_type": [
+      {
+        "go_type": "[]byte"
+      },
+      {
+        "go_type": "*C.char"
+      }
+    ]
+  },
+  {
+    "package": "main",
+    "name": "Fibo",
+    "docs": "",
+    "arguments": [
+      {
+        "name": "n",
+        "type": {
+          "go_type": "int"
+        }
+      }
+    ],
+    "return_type": [
+      {
+        "go_type": "int"
+      }
+    ]
+  },
+  {
+    "package": "main",
+    "name": "FindPrimes",
+    "docs": "",
+    "arguments": [
+      {
+        "name": "n",
+        "type": {
+          "go_type": "int"
+        }
+      }
+    ],
+    "return_type": [
+      {
+        "go_type": "[]int"
+      }
+    ]
+  },
+  {
+    "package": "main",
+    "name": "SolveSudoku",
+    "docs": "",
+    "arguments": [
+      {
+        "name": "board_flat",
+        "type": {
+          "go_type": "[]int"
+        }
+      },
+      {
+        "name": "print",
+        "type": {
+          "go_type": "bool"
+        }
+      }
+    ],
+    "return_type": [
+      {
+        "go_type": "bool"
+      }
+    ]
+  }
+]

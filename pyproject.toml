@@ -21,6 +21,7 @@ dev = [
     "fastapi>=0.115.10",
     "ipykernel>=6.29.5",
     "ipython>=8.32.0",
+    "numpy>=2.2.4",
     "pyperclip>=1.9.0",
     "pytest>=8.3.5",
     "requests>=2.32.3",
