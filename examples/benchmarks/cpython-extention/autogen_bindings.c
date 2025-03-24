@@ -95,6 +95,60 @@ static PyObject* benchmarks_findPrimes(PyObject* self, PyObject* args) {
     return py_result;
 }
 
+static PyObject* benchmarks_file_md5(PyObject* self, PyObject* args) { 
+    char* filePath;
+    if (!PyArg_ParseTuple(args, "s", &filePath))
+        return NULL;
+    GoString go_filePath = {filePath, (GoInt)strlen(filePath)};
+    char* result = File_md5(go_filePath);
+    PyObject* py_result = result==NULL ? GetPyNone() : PyUnicode_FromString(result);
+    free(result);
+    return py_result;
+}
+
+static PyObject* benchmarks_file_list_md5(PyObject* self, PyObject* args) { 
+    PyObject* filePaths;
+    if (!PyArg_ParseTuple(args, "O", &filePaths))
+        return NULL;
+    if (!PyList_Check(filePaths)) {
+        PyErr_SetString(PyExc_TypeError, "Argument filePaths must be a list");
+        return NULL;
+    }
+    int len_filePaths = PyList_Size(filePaths);
+    GoString* filePaths_CArray = malloc(len_filePaths * sizeof(GoString));
+    for (int i = 0; i < len_filePaths; i++) {
+        PyObject* item = PyList_GetItem(filePaths, i);
+        if (!PyUnicode_Check(item)) {
+            PyErr_SetString(PyExc_TypeError, "List items must be PyUnicode");
+            free(filePaths_CArray);
+            return NULL;
+        }
+        const char* c_item = PyUnicode_AsUTF8(item);
+        filePaths_CArray[i] = (GoString) {c_item, (GoInt)strlen(c_item)};
+    }
+    if (PyErr_Occurred()) {
+        free(filePaths_CArray);
+        return NULL;
+    }
+    GoSlice go_filePaths = {filePaths_CArray, (GoInt)len_filePaths, (GoInt)len_filePaths};
+    GoSlice result = File_list_md5(go_filePaths);
+    free(filePaths_CArray);
+    PyObject* py_result;
+    if (result.data == NULL) {
+        py_result = GetPyNone();
+    } else {
+        py_result = PyList_New(result.len);
+        for (int i = 0; i < result.len; i++) {
+            char* item = ((char**)result.data)[i];
+            PyObject* py_item = item==NULL ? GetPyNone() : PyUnicode_FromString(item);
+            free(item);
+            PyList_SetItem(py_result, i, py_item);
+        }
+    }
+    free(result.data);
+    return py_result;
+}
+
 static PyObject* benchmarks_solveSudoku(PyObject* self, PyObject* args) { 
     PyObject* board_flat;
     int print;
@@ -133,6 +187,8 @@ static PyMethodDef Methods[] = {
     {"getRequest", benchmarks_getRequest, METH_VARARGS, "getRequest"},
     {"fibo", benchmarks_fibo, METH_VARARGS, "fibo"},
     {"findPrimes", benchmarks_findPrimes, METH_VARARGS, "findPrimes"},
+    {"file_md5", benchmarks_file_md5, METH_VARARGS, "file_md5"},
+    {"file_list_md5", benchmarks_file_list_md5, METH_VARARGS, "file_list_md5"},
     {"solveSudoku", benchmarks_solveSudoku, METH_VARARGS, "solveSudoku"},
     {NULL, NULL, 0, NULL}
 };
