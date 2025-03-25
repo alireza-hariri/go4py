@@ -84,7 +84,7 @@ static PyObject* test_func_2(PyObject* self, PyObject* args) {
         return NULL;
     }
     int len_b = PyList_Size(b);
-    char** b_CArray = malloc(len_b * sizeof(char*));
+    const char** b_CArray = malloc(len_b * sizeof(char*));
     for (int i = 0; i < len_b; i++) {
         PyObject* item = PyList_GetItem(b, i);
         if (!PyUnicode_Check(item)) {
@@ -107,6 +107,7 @@ static PyObject* test_func_2(PyObject* self, PyObject* args) {
     RETURN_NONE;
 }"""
 test_cases["string_slice_inputs"] = (fn, fn_res)
+print(gen_fn(fn, "test"))
 
 #####
 
@@ -201,7 +202,6 @@ static PyObject* test_func_5(PyObject* self, PyObject* args) {
     return py_result;
 }"""
 test_cases["return_string&byte_slices"] = (fn, fn_res)
-print(gen_fn(fn, "test"))
 
 
 @pytest.mark.parametrize("fn,fn_res", test_cases.values(), ids=test_cases.keys())

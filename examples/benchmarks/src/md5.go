@@ -5,6 +5,7 @@ import "C"
 import (
 	"crypto/md5"
 	"encoding/hex"
+	"io"
 
 	"os"
 
@@ -13,7 +14,7 @@ import (
 )
 
 const (
-	chunkSize = 8 * 1024 * 1024 // 8MB
+	chunkSize = 2 * 1024 * 1024 // 2MB
 )
 
 // pre allocate a pool of buffers for lower memory allocation overhead (and also lower GC time)
@@ -64,4 +65,38 @@ func File_list_md5(filePaths []string) []*C.char {
 		md5s[res.idx] = res.md5
 	}
 	return md5s
+}
+
+//export File_md5_method2
+func File_md5_method2(filePath string) *C.char {
+	file, err := os.Open(filePath)
+	if err != nil {
+		return nil
+	}
+	defer file.Close()
+	hasher := md5.New()
+	_, err = io.Copy(hasher, file)
+	if err != nil {
+		return nil
+	}
+	return C.CString(hex.EncodeToString(hasher.Sum(nil)))
+}
+
+//export File_md5_method3
+func File_md5_method3(filePath string) *C.char {
+	buffer, err := os.ReadFile(filePath)
+	if err != nil {
+		return nil
+	}
+	hasher := md5.New()
+	hasher.Write(buffer)
+	return C.CString(hex.EncodeToString(hasher.Sum(nil)))
+}
+
+// same as method2 but with no-gil annotation
+// [go4py] no-gil
+//
+//export File_md5_method4
+func File_md5_method4(filePath string) *C.char {
+	return File_md5_method2(filePath)
 }

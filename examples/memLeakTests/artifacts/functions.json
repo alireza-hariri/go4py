@@ -114,6 +114,42 @@
   },
   {
     "package": "main",
+    "name": "Func_7",
+    "docs": "",
+    "arguments": [
+      {
+        "name": "a",
+        "type": {
+          "go_type": "string"
+        }
+      },
+      {
+        "name": "b",
+        "type": {
+          "go_type": "uint16"
+        }
+      },
+      {
+        "name": "c",
+        "type": {
+          "go_type": "string"
+        }
+      },
+      {
+        "name": "d",
+        "type": {
+          "go_type": "float64"
+        }
+      }
+    ],
+    "return_type": [
+      {
+        "go_type": "bool"
+      }
+    ]
+  },
+  {
+    "package": "main",
     "name": "Func_8",
     "docs": "",
     "arguments": [

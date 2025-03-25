@@ -52,14 +52,15 @@ static PyObject* test_func_14(PyObject* self, PyObject* args) {
     long arg0;
     if (!PyArg_ParseTuple(args, "l", &arg0))
         return NULL;
+    GoSlice result;
     Py_BEGIN_ALLOW_THREADS
-    GoSlice result = Func_14(arg0);
+    result = Func_14(arg0);
     Py_END_ALLOW_THREADS
     PyObject* py_result = result.data==NULL ? GetPyNone() : PyBytes_FromStringAndSize(result.data, result.len);
     free(result.data);
     return py_result;
 }"""
-test_cases["no-gil"] = (fn, fn_res)
+test_cases["no_gil_function"] = (fn, fn_res)
 
 print(gen_fn(fn, "test"))
 

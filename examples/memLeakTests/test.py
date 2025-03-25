@@ -1,6 +1,6 @@
 import random
 
-from examples.memLeakTests import func_x, func_5, func_6, func_8, func_10, func_11
+from examples.memLeakTests import func_x, func_5, func_6, func_7, func_8, func_10, func_11
 
 from examples.memLeakTests import func_1, func_2, func_3, func_4, func_5_2
 
@@ -22,3 +22,6 @@ func_4()
 
 %%timeit
 func_5_2()
+
+%%timeit
+func_7("1", 1, "2", 3.0)

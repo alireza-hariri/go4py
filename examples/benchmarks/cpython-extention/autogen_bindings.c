@@ -149,6 +149,42 @@ static PyObject* benchmarks_file_list_md5(PyObject* self, PyObject* args) {
     return py_result;
 }
 
+static PyObject* benchmarks_file_md5_method2(PyObject* self, PyObject* args) { 
+    char* filePath;
+    if (!PyArg_ParseTuple(args, "s", &filePath))
+        return NULL;
+    GoString go_filePath = {filePath, (GoInt)strlen(filePath)};
+    char* result = File_md5_method2(go_filePath);
+    PyObject* py_result = result==NULL ? GetPyNone() : PyUnicode_FromString(result);
+    free(result);
+    return py_result;
+}
+
+static PyObject* benchmarks_file_md5_method3(PyObject* self, PyObject* args) { 
+    char* filePath;
+    if (!PyArg_ParseTuple(args, "s", &filePath))
+        return NULL;
+    GoString go_filePath = {filePath, (GoInt)strlen(filePath)};
+    char* result = File_md5_method3(go_filePath);
+    PyObject* py_result = result==NULL ? GetPyNone() : PyUnicode_FromString(result);
+    free(result);
+    return py_result;
+}
+
+static PyObject* benchmarks_file_md5_method4(PyObject* self, PyObject* args) { 
+    char* filePath;
+    if (!PyArg_ParseTuple(args, "s", &filePath))
+        return NULL;
+    GoString go_filePath = {filePath, (GoInt)strlen(filePath)};
+    char* result;
+    Py_BEGIN_ALLOW_THREADS
+    result = File_md5_method4(go_filePath);
+    Py_END_ALLOW_THREADS
+    PyObject* py_result = result==NULL ? GetPyNone() : PyUnicode_FromString(result);
+    free(result);
+    return py_result;
+}
+
 static PyObject* benchmarks_solveSudoku(PyObject* self, PyObject* args) { 
     PyObject* board_flat;
     int print;
@@ -189,6 +225,9 @@ static PyMethodDef Methods[] = {
     {"findPrimes", benchmarks_findPrimes, METH_VARARGS, "findPrimes"},
     {"file_md5", benchmarks_file_md5, METH_VARARGS, "file_md5"},
     {"file_list_md5", benchmarks_file_list_md5, METH_VARARGS, "file_list_md5"},
+    {"file_md5_method2", benchmarks_file_md5_method2, METH_VARARGS, "file_md5_method2"},
+    {"file_md5_method3", benchmarks_file_md5_method3, METH_VARARGS, "file_md5_method3"},
+    {"file_md5_method4", benchmarks_file_md5_method4, METH_VARARGS, "file_md5_method4"},
     {"solveSudoku", benchmarks_solveSudoku, METH_VARARGS, "solveSudoku"},
     {NULL, NULL, 0, NULL}
 };

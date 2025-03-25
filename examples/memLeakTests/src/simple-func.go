@@ -34,6 +34,12 @@ func Func_6(a string) *C.char {
 	return nil
 }
 
+//export Func_7
+func Func_7(a string, b uint16, c string, d float64) bool {
+	// randomly return true or false
+	return rand.Intn(2) == 0
+}
+
 //export Func_8
 func Func_8(a *C.char) {
 	// randomly return string or nil

@@ -71,15 +71,24 @@ def get_return_c_type(fn: GoFunction) -> str:
 
 def gen_fn_call(fn: GoFunction, doc_annots: DocAnnots):
     args = [("go_" + a.name if a.type.need_copy else a.name) for a in fn.arguments]
-    if doc_annots.no_gil:
-        before = "    Py_BEGIN_ALLOW_THREADS\n"
-        after = "\n    Py_END_ALLOW_THREADS"
-    else:
-        before = after = ""
+
     if len(fn.return_type) == 0:
+        if doc_annots.no_gil:
+            before = "    Py_BEGIN_ALLOW_THREADS\n"
+            after = "\n    Py_END_ALLOW_THREADS"
+        else:
+            before = after = ""
+        # call the function without return value
         return f"{before}    {fn.name}({','.join(args)});{after}"
     else:
-        return f"{before}    {get_return_c_type(fn)} result = {fn.name}({','.join(args)});{after}"
+        if doc_annots.no_gil:
+            return f"""    {get_return_c_type(fn)} result;
+    Py_BEGIN_ALLOW_THREADS
+    result = {fn.name}({",".join(args)});
+    Py_END_ALLOW_THREADS"""
+        else:
+            # call the function with return value
+            return f"    {get_return_c_type(fn)} result = {fn.name}({','.join(args)});"
 
 
 class ReturnConverter:

@@ -78,10 +78,10 @@ This document presents benchmark results comparing the performance of Go4Py agai
 | `MD5 (parallel)`         | 1000    | 4     | 14.7x   | the MD5 hash of 1000 file    |
 | `MD5 (parallel)`         | 10000   | -1    | 3.3x    | the MD5 hash of 10000 file   |
 | `MD5 (parallel)`         | 100000  | -1    | 1.7x    | the MD5 hash of 100000 file  |
- * we use joblib to parallelize the MD5 hash calculation on python side and native go-routine on go side.
+ * we use joblib to parallelize the MD5 hash calculation on python side and we use native go-routine on go side.
  * we do a search in the python side to find the best n_jobs for each input size.
  * when there is enough inputs the overhead of python parallelization become less significant and the speedup will be closer to the speedup of single file.
-
+ * the speedup is some what consistent for different file sizes.
 ## Conclusions
 
 * Go4Py demonstrates significant speedups in non-trival tasks like `Fibonacci` and `FindPrimes`. The speedup tends to increase with the input size `n`.

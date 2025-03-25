@@ -152,6 +152,60 @@
   },
   {
     "package": "main",
+    "name": "File_md5_method2",
+    "docs": "",
+    "arguments": [
+      {
+        "name": "filePath",
+        "type": {
+          "go_type": "string"
+        }
+      }
+    ],
+    "return_type": [
+      {
+        "go_type": "*C.char"
+      }
+    ]
+  },
+  {
+    "package": "main",
+    "name": "File_md5_method3",
+    "docs": "",
+    "arguments": [
+      {
+        "name": "filePath",
+        "type": {
+          "go_type": "string"
+        }
+      }
+    ],
+    "return_type": [
+      {
+        "go_type": "*C.char"
+      }
+    ]
+  },
+  {
+    "package": "main",
+    "name": "File_md5_method4",
+    "docs": "same as method2 but with no-gil annotation\n[go4py] no-gil\n",
+    "arguments": [
+      {
+        "name": "filePath",
+        "type": {
+          "go_type": "string"
+        }
+      }
+    ],
+    "return_type": [
+      {
+        "go_type": "*C.char"
+      }
+    ]
+  },
+  {
+    "package": "main",
     "name": "SolveSudoku",
     "docs": "",
     "arguments": [

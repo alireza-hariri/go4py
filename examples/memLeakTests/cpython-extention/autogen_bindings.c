@@ -197,6 +197,19 @@ static PyObject* memLeakTests_func_6(PyObject* self, PyObject* args) {
     return py_result;
 }
 
+static PyObject* memLeakTests_func_7(PyObject* self, PyObject* args) { 
+    char* a;
+    unsigned short b;
+    char* c;
+    double d;
+    if (!PyArg_ParseTuple(args, "sHsd", &a, &b, &c, &d))
+        return NULL;
+    GoString go_a = {a, (GoInt)strlen(a)};
+    GoString go_c = {c, (GoInt)strlen(c)};
+    int result = Func_7(go_a,b,go_c,d);
+    return PyBool_FromLong(result);
+}
+
 static PyObject* memLeakTests_func_8(PyObject* self, PyObject* args) { 
     char* a;
     if (!PyArg_ParseTuple(args, "s", &a))
@@ -233,6 +246,7 @@ static PyMethodDef Methods[] = {
     {"func_x", memLeakTests_func_x, METH_VARARGS, "func_x"},
     {"func_5", memLeakTests_func_5, METH_VARARGS, "func_5"},
     {"func_6", memLeakTests_func_6, METH_VARARGS, "func_6"},
+    {"func_7", memLeakTests_func_7, METH_VARARGS, "func_7"},
     {"func_8", memLeakTests_func_8, METH_VARARGS, "func_8"},
     {"func_10", memLeakTests_func_10, METH_VARARGS, "func_10"},
     {"func_11", memLeakTests_func_11, METH_VARARGS, "func_11"},

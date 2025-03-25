@@ -170,7 +170,7 @@ static PyObject* test_func_7(PyObject* self, PyObject* args) {
         return NULL;
     GoString go_a = {a, (GoInt)strlen(a)};
     GoString go_c = {c, (GoInt)strlen(c)};
-    char result = Func_7(go_a,b,go_c,d);
+    int result = Func_7(go_a,b,go_c,d);
     return PyBool_FromLong(result);
 }"""
 test_cases["multi_arg_bool_return"] = (fn, fn_res)
