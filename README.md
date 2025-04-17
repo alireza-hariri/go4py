@@ -8,13 +8,6 @@ Enjoy the speed and simplicity of Go within Python! You just need to write bottl
 
 Check the performance boost in our [benchmarks](docs/benchmark.md) and get a sense of how much faster it can be compared to basic Python! 🚀
 
-## How it works
-There is a Makefile in the created directory with four major steps:
-1. Parsing the Go code and extracting the signatures of the functions (the `functions.json` file).
-2. Building an object file from Go code (`.a` and `.h` files).
-3. Making a C wrapper for the Go functions as a Python native C extension.
-4. Building a shared library from the generated C code (`__init__.so` file or `__init__.pyd` file).
-The Makefile is actually quite readable, and you can modify it to your needs `go4py` will just run it 
 
 ## Installation
 #### Linux
@@ -22,7 +15,7 @@ The Makefile is actually quite readable, and you can modify it to your needs `go
  2. `pip install go4py`
 #### Windows
  1. Install Go
- 2. Install [MSYS2](https://www.msys2.org/) and install [mingw-toolchain](https://packages.msys2.org/groups/mingw-w64-x86_64-toolchain) inside it.
+ 2. Install [MSYS2](https://www.msys2.org/) and then install [mingw-toolchain](https://packages.msys2.org/groups/mingw-w64-x86_64-toolchain) inside it.
  3. Install `go4py` in a python vitrual exnvironment.
  4. Open a mingw shell and activate the venv inside it (e.g. `source venv/Scripts/activate`)
  5. Add Go to your PATH in the mingw shell (e.g., `export PATH=$PATH:"/c/Program Files/Go/bin/"`)
@@ -47,9 +40,17 @@ from <module_name> import <function_name>
 ```
 Please note that we convert the function names' first character to lower case.
 
+## How it works
+There is a Makefile in the created directory with four major steps:
+1. Parsing the Go code and extracting the signatures of the functions (the `functions.json` file).
+2. Building an object file from Go code (`.a` and `.h` files).
+3. Making a C wrapper for the Go functions as a Python native C extension.
+4. Building a shared library from the generated C code (`__init__.so` file or `__init__.pyd` file).
+
+The Makefile is actually quite readable, and you can modify it to your needs `go4py` will just run it 
 
 ## Documentation
-Currently, we don't have good documentation, but you can check the [examples](examples) directory for some examples. And better than that, you can take a look at the [tests](tests) directory and see the codes that go4py generates.
+Currently, we don't have good documentation, but you can check the [examples](examples) directory for some examples. And better than that, you can take a look at the [tests](tests) directory and see the codes that `go4py` generates.
 
 ### TODO
  - [x] Windows support
