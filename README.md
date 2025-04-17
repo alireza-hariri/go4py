@@ -6,7 +6,7 @@
 Do you ever wish Python were faster? `go4py` is here to help!
 Enjoy the speed and simplicity of Go within Python! You just need to write bottlenecks of your Python code as some CGo functions. `go4py` will automatically generate the Python module for you!
 
-Curious about the performance boost? Dive into our [benchmarks](docs/benchmark.md) and get a sense of how much faster it can be compared to basic Python! 🚀
+Check the performance boost in our [benchmarks](docs/benchmark.md) and get a sense of how much faster it can be compared to basic Python! 🚀
 
 ## How it works
 There is a Makefile in the created directory with four major steps:
