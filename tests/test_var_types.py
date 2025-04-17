@@ -1,7 +1,21 @@
 import pytest
 
-
 from go4py.types import IntType, CStringType, GoStringType, BoolType, FloatType, Variable
+
+
+test_cases = {}
+v = Variable(name="v", type={"go_type": "string"})
+test_cases["string"] = (v, GoStringType)
+v = Variable(name="v", type={"go_type": "*C.char"})
+test_cases["c_char"] = (v, CStringType)
+v = Variable(name="v", type={"go_type": "bool"})
+test_cases["bool"] = (v, BoolType)
+
+
+@pytest.mark.parametrize("var,expected_type", test_cases.values(), ids=test_cases.keys())
+def test_other_types(var, expected_type):
+    assert type(var.type) is expected_type
+
 
 int_test_cases = {}
 
@@ -45,19 +59,3 @@ float_test_cases["float64"] = (v, 64)
 def test_float_type(var, bits):
     assert type(var.type) is FloatType
     assert var.type.bits == bits
-
-
-others_test_cases = {}
-v = Variable(name="v", type={"go_type": "string"})
-others_test_cases["string"] = (v, GoStringType)
-v = Variable(name="v", type={"go_type": "*C.char"})
-others_test_cases["c_char"] = (v, CStringType)
-v = Variable(name="v", type={"go_type": "bool"})
-others_test_cases["bool"] = (v, BoolType)
-
-
-@pytest.mark.parametrize(
-    "var,expected_type", others_test_cases.values(), ids=others_test_cases.keys()
-)
-def test_other_types(var, expected_type):
-    assert type(var.type) is expected_type

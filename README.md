@@ -17,14 +17,16 @@ There is a Makefile in the created directory with four major steps:
 The Makefile is actually quite readable, and you can modify it to your needs `go4py` will just run it 
 
 ## Installation
-#### Windows
- 1. Install Go
- 2. Install [MSYS2](https://www.msys2.org/) and install [mingw-toolchain](https://packages.msys2.org/groups/mingw-w64-x86_64-toolchain) inside it.
- 3. `pip install go4py`
- 4. Add Go to your PATH in the mingw shell (e.g., `export PATH=$PATH:"/c/Program Files/Go/bin/"`)
 #### Linux
  1. Install Go
  2. `pip install go4py`
+#### Windows
+ 1. Install Go
+ 2. Install [MSYS2](https://www.msys2.org/) and install [mingw-toolchain](https://packages.msys2.org/groups/mingw-w64-x86_64-toolchain) inside it.
+ 3. Install `go4py` in a python vitrual exnvironment.
+ 4. Open a mingw shell and activate the venv inside it (e.g. `source venv/Scripts/activate`)
+ 5. Add Go to your PATH in the mingw shell (e.g., `export PATH=$PATH:"/c/Program Files/Go/bin/"`)
+
 
 ## Usage
  To create a Go package inside your Python project:
@@ -39,8 +41,7 @@ The Makefile is actually quite readable, and you can modify it to your needs `go
  go4py build <module_name>
 ```
 
-You can import the functions as methods of the module:
-
+You can now import the functions as methods of a python module:
 ```python
 from <module_name> import <function_name>
 ```
