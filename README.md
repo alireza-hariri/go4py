@@ -1,8 +1,61 @@
+<div style="text-align: center;">
+<img src="docs/img/go4py.png" width="290" style=""/>
+<h2> go4py: The Best of Both Worlds</h2>
+</div>
+
+Do you ever wish Python were faster? `go4py` is here to help!
+Enjoy the speed and simplicity of Go within Python! You just need to write bottlenecks of your Python code as some CGo functions. `go4py` will automatically generate the Python module for you!
+
+Curious about the performance boost? Dive into our [benchmarks](docs/benchmark.md) and get a sense of how much faster it can be compared to basic Python! 🚀
+
+## How it works
+There is a Makefile in the created directory with four major steps:
+1. Parsing the Go code and extracting the signatures of the functions (the `functions.json` file).
+2. Building an object file from Go code (`.a` and `.h` files).
+3. Making a C wrapper for the Go functions as a Python native C extension.
+4. Building a shared library from the generated C code (`__init__.so` file or `__init__.pyd` file).
+The Makefile is actually quite readable, and you can modify it to your needs `go4py` will just run it 
+
+## Installation
+#### Windows
+ 1. Install Go
+ 2. Install [MSYS2](https://www.msys2.org/) and install [mingw-toolchain](https://packages.msys2.org/groups/mingw-w64-x86_64-toolchain) inside it.
+ 3. `pip install go4py`
+ 4. Add Go to your PATH in the mingw shell (e.g., `export PATH=$PATH:"/c/Program Files/Go/bin/"`)
+#### Linux
+ 1. Install Go
+ 2. `pip install go4py`
+
+## Usage
+ To create a Go package inside your Python project:
+```shell
+ go4py init <module_name>
+```
+ This will create a directory with the name `<module_name>` and add `go.mod` to your project.
+ You can go to `<module_name>/src` directory and add your Go functions there.
+
+ To build the Go package and generate bindings code for the Python module:
+```shell
+ go4py build <module_name>
+```
+
+You can import the functions as methods of the module:
+
+```python
+from <module_name> import <function_name>
+```
+Please note that we convert the function names' first character to lower case.
 
 
-# go4py
+## Documentation
+Currently, we don't have good documentation, but you can check the [examples](examples) directory for some examples. And better than that, you can take a look at the [tests](tests) directory and see the codes that go4py generates.
 
-# TODO
- - [] Warn the user if it uses string or other dynamicly allocated types as result
- - [] unexported function warn + export with space (`// export`) 
- - [] python type definition file
+### TODO
+ - [x] Windows support
+ - [x] no-GIL mode
+ - [x] custom user bindings code
+ - [x] make a helper function in go for passing Go slices to C
+ - [ ] Warn the user if it uses string or other dynamically allocated types as a result.
+ - [ ] Warn the user for an unexported function or wrong export with space (`// export`).
+ - [ ] Generate type definitions file (`.pyi` file).
+ - [ ] Can we make async Python functions or not?

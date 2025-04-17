@@ -2,5 +2,11 @@
 __pycache__
 
 **/artifacts/build
-go4py/parse
-img/go4py.xcf
+/go4py/parse
+go4py.xcf
+/go4py.egg-info/
+/dist/
+/.venv/
+/.env
+/.pytest_cache
+/.vscode

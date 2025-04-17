@@ -1,13 +1,13 @@
 [build-system]
-requires = ["setuptools>=61.0"]
+requires = ["setuptools"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "go4py"
-version = "0.1.0"
+version = "0.1.72"
 description = "Add your description here"
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.10,<3.13"
 dependencies = [
     "click>=8.1.8",
     "msgpack>=1.1.0",
@@ -18,20 +18,20 @@ dependencies = [
 
 [dependency-groups]
 dev = [
-    "fastapi>=0.115.10",
-    "ipykernel>=6.29.5",
-    "ipython>=8.32.0",
+    "ipython>=8.35.0",
     "joblib>=1.4.2",
     "numpy>=2.2.4",
-    "pyperclip>=1.9.0",
     "pytest>=8.3.5",
     "requests>=2.32.3",
-    "uvicorn>=0.34.0",
+    "twine>=6.1.0",
+
 ]
 
 [project.scripts]
-go4py = "go4py.cli:cli"  # This creates the 'cooltool' executable
+go4py = "go4py.cli:cli"  # This creates the executable
 
 [tool.setuptools]
 packages = ["go4py"]  # List all your package directories
 
+[tool.setuptools.package-data]
+"go4py" = ["templates/**","go_cmd/**","**/*.py"]

@@ -1,4 +1,6 @@
+from importlib import metadata
 import sys
+import sysconfig
 import click
 import os
 import subprocess
@@ -100,7 +102,7 @@ def parse(args):
     exetutable = HERE / "parse"
     if not exetutable.exists():
         # try to build it
-        os.system(f"go build -o {str(exetutable)} {HERE / '../go_cmd/parse'}")
+        os.system(f"go build -o {str(exetutable)} {HERE / './go_cmd/parse/main.go'}")
     if not exetutable.exists():
         click.echo("Error: parse executable not found.")
         # exit with error
@@ -114,6 +116,32 @@ def parse(args):
 @click.argument("bold_text", default="")
 def textbox(text, bold_text):
     print_text_box(text, bold_text)
+
+
+@cli.command()
+def version():
+    """version of go4py"""
+    print(metadata.version("go4py"))
+
+
+@cli.command()
+def py_include_path():
+    """To be used as a -I flag"""
+    print(sysconfig.get_path("include"))
+
+
+@cli.command()
+def py_lib_path():
+    """To be used as a -L flag"""
+    path = Path(sysconfig.get_config_var("installed_base"))
+
+    file1 = path / "lib/libpython3.so"
+    if file1.exists():
+        print(str(file1.parent))
+
+    file2 = path / "libs/python3.lib"
+    if file2.exists():
+        print(str(file2.parent))
 
 
 if __name__ == "__main__":

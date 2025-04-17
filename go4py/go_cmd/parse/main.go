@@ -8,24 +8,7 @@ import (
 	"go/parser"
 	"go/token"
 	"os"
-
-	"github.com/sirupsen/logrus"
 )
-
-func init() {
-	// Configure logger to include timestamp and info level
-	logrus.SetLevel(logrus.InfoLevel)
-	logrus.SetFormatter(&logrus.TextFormatter{
-		FullTimestamp:   true,       // Include full timestamp
-		TimestampFormat: "15:04:05", // Customize timestamp format
-		//DisableColors: true, // Uncomment to disable color output
-		// ForceColors:      true,  // force colors even if not a TTY
-		PadLevelText:           true,
-		DisableLevelTruncation: true,
-	})
-	// set perfix
-
-}
 
 type VarType struct {
 	GoType string `json:"go_type"`
@@ -44,6 +27,19 @@ type GoFunction struct {
 	ReturnType []VarType  `json:"return_type"`
 }
 
+
+var DEBUG = false
+
+func Errorf(format string, args ...interface{}) {
+	fmt.Fprintf(os.Stderr, "ERROR: "+format+"\n", args...)
+}
+
+func Debugf(format string, args ...interface{}) {
+	if DEBUG {
+		fmt.Printf("DEBUG: "+format+"\n", args...)
+	}
+}
+
 func readNodeText(content string, fset *token.FileSet, n ast.Node) (string, error) {
 	s := fset.Position((n).Pos()).Offset
 	e := fset.Position((n).End()).Offset
@@ -57,7 +53,7 @@ func readNodeText(content string, fset *token.FileSet, n ast.Node) (string, erro
 func getFileContent(n string) (string, error) {
 	data, err := os.ReadFile(n)
 	if err != nil {
-		logrus.Errorf("Error reading file: %v", err)
+		Errorf("Error reading file: %v", err)
 		return "", err
 	}
 	return string(data), nil
@@ -73,28 +69,28 @@ func main() {
 		dirPath = os.Args[1]
 	}
 	if len(os.Args) > 2 && os.Args[2] == "--debug" {
-		logrus.SetLevel(logrus.DebugLevel)
+		DEBUG = true
 	}
 	d, err := parser.ParseDir(fset, dirPath, nil, parser.ParseComments)
 	if err != nil {
-		logrus.Errorf("%v", err)
+		Errorf("%v", err)
 		return
 	}
 	for k, pkg := range d {
-		logrus.Debugf("package %s", k)
+		Debugf("package %s", k)
 		for n, file := range pkg.Files {
-			logrus.Debugf("File name: %q", n)
+			Debugf("File name: %q", n)
 			// Get the file's content
 			fileContent, err := getFileContent(n)
 			if err != nil {
-				logrus.Errorf("%v", err)
+				Errorf("%v", err)
 				continue
 			}
 
 			for _, decl := range file.Decls {
 				fn, ok := decl.(*ast.FuncDecl)
 				if ok {
-					logrus.Debugf("Function name: %s", fn.Name.Name)
+					Debugf("Function name: %s", fn.Name.Name)
 
 					// if its exported function
 					if fn.Name.IsExported() {
@@ -110,10 +106,10 @@ func main() {
 						for _, param := range fn.Type.Params.List {
 							t, err := readNodeText(fileContent, fset, param.Type)
 							if err != nil {
-								logrus.Errorf("%v", err)
+								Errorf("%v", err)
 								continue
 							}
-							logrus.Debugf("params %v %s", param.Names, t) //, param.Type)
+							Debugf("params %v %s", param.Names, t) //, param.Type)
 
 							// Add arguments to the GoFunction
 							for _, name := range param.Names {
@@ -131,18 +127,18 @@ func main() {
 								// read file from pos to end of param.Type
 								t, err := readNodeText(fileContent, fset, param.Type)
 								if err != nil {
-									logrus.Errorf("%v", err)
+									Errorf("%v", err)
 									continue
 								}
 
-								logrus.Debugf("result %s", t) //, param.Type)
+								Debugf("result %s", t) //, param.Type)
 								// Append to return types
 								goFunc.ReturnType = append(goFunc.ReturnType, VarType{GoType: t})
 
 								// // if its sclice
 								// if slice, ok := param.Type.(*ast.ArrayType); ok {
 								// 	t2, _ := readNodeText(fileContent, fset, slice.Elt)
-								// 	logrus.Debugf("slice-type: %s", t2)
+								// 	Debugf("slice-type: %s", t2)
 								// 	goFunc.ReturnType = &VarType{GoType: t2}
 								// }
 								// // if its map
@@ -166,9 +162,9 @@ func main() {
 							structType, ok := typeSpec.Type.(*ast.StructType)
 
 							if ok {
-								logrus.Debugf("struct: %s", typeSpec.Name.Name)
+								Debugf("struct: %s", typeSpec.Name.Name)
 								for _, field := range structType.Fields.List {
-									logrus.Debugf("field: %s", field.Names[0].Name)
+									Debugf("field: %s", field.Names[0].Name)
 								}
 								// Newline for readability in logs
 							}
@@ -180,7 +176,7 @@ func main() {
 		p := doc.New(pkg, "./", doc.AllDecls)
 		for _, f := range p.Funcs {
 			if f.Doc != "" {
-				logrus.Debugf("%s docs: %s", f.Name, f.Doc)
+				Debugf("%s docs: %s", f.Name, f.Doc)
 
 				// Update the documentation for the corresponding function in our list
 				for i := range functions {
@@ -196,16 +192,16 @@ func main() {
 	// Marshal the functions slice to JSON
 	jsonData, err := json.MarshalIndent(functions, "", "  ")
 	if err != nil {
-		logrus.Errorf("Error marshaling to JSON: %v", err)
+		Errorf("Error marshaling to JSON: %v", err)
 		return
 	}
 
 	// Save the JSON to a file
 	err = os.WriteFile("artifacts/functions.json", jsonData, 0644)
 	if err != nil {
-		logrus.Errorf("Error writing JSON to file: %v", err)
+		Errorf("Error writing JSON to file: %v", err)
 		return
 	}
 
-	logrus.Debugf("Successfully saved %d functions to functions.json", len(functions))
+	Debugf("Successfully saved %d functions to functions.json", len(functions))
 }
