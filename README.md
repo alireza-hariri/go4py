@@ -1,6 +1,6 @@
 <div style="text-align: center;">
 <img src="docs/img/go4py.png" width="290" style=""/>
-<h2> go4py: The Best of Both Worlds</h2>
+<h2> go4py: ⚡ Supercharge your Python with Go ⚡ </h2>
 </div>
 
 Do you ever wish Python were faster? `go4py` is here to help!
