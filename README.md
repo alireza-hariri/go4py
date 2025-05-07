@@ -68,3 +68,8 @@ Currently, we don't have good documentation, but you can check the [examples](ex
  - [ ] Warn the user for an unexported function or wrong export with space (`// export`).
  - [ ] Generate type definitions file (`.pyi` file).
  - [ ] Can we make async Python functions or not?
+
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=alireza-hariri/go4py&type=Date)](https://www.star-history.com/#alireza-hariri/go4py&Date)
