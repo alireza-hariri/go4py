@@ -3,6 +3,13 @@
 <h2> go4py: ⚡ Supercharge your Python with Go ⚡ </h2>
 </div>
 
+
+<img alt="GitHub repo size" src="https://img.shields.io/github/repo-size/alireza-hariri/go4py"> <img alt="GitHub contributors" src="https://img.shields.io/github/contributors/alireza-hariri/go4py"> <img alt="GitHub repo Licence" src="https://img.shields.io/pypi/l/go4py">
+
+[![Latest version](https://img.shields.io/pypi/v/go4py)](https://pypi.python.org/pypi/go4py) [![Supported python versions](https://img.shields.io/pypi/pyversions/go4py)](https://pypi.python.org/pypi/go4py) [![Downloads](https://static.pepy.tech/badge/go4py)](https://pepy.tech/projects/go4py) [![Downloads](https://static.pepy.tech/badge/go4py/month)](https://pepy.tech/project/go4py)
+  
+
+
 Do you ever wish Python were faster? `go4py` is here to help!
 Enjoy the speed and simplicity of Go within Python! You just need to write bottlenecks of your Python code as some CGo functions. `go4py` will automatically generate the Python module for you!
 
