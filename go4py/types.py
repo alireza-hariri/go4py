@@ -90,7 +90,7 @@ class IntType(VarType):
     need_copy: ClassVar[bool] = False
 
     def model_post_init(self, __context):
-        if self.go_type in ["int", "uint"]:
+        if self.go_type in ["int", "uint", "int64", "uint64"]:
             self.bits = 64
         elif self.go_type in ["int8", "uint8", "byte"]:
             self.bits = 8
@@ -98,8 +98,6 @@ class IntType(VarType):
             self.bits = 16
         elif self.go_type in ["int32", "uint32", "rune"]:
             self.bits = 32
-        elif self.go_type in ["int64", "uint64"]:
-            self.bits = 64
         else:
             raise ValueError(f"Unsupported go type: {self.go_type}")
         if self.go_type in ["uint", "uint8", "uint16", "uint32", "uint64", "byte"]:
@@ -162,7 +160,7 @@ class IntType(VarType):
 
 
 class FloatType(VarType):
-    go_type: Literal["float64", "float32"] = "float"
+    go_type: Literal["float64", "float32"] = "float64"
     bits: int = 64
     need_copy: ClassVar[bool] = False
 
@@ -250,9 +248,6 @@ class CStringType(VarType):
 
     def need_free(self):
         return True
-
-    def cgo_type(self):
-        return "char*"
 
 
 class GoStringType(VarType):

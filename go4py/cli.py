@@ -84,7 +84,7 @@ def build(build_path):
 
     for makepath in find_make_files(build_path):
         click.echo(f"Building module '{makepath}'...")
-        subprocess.run(["make", "-C", str(makepath), "-j2"])
+        subprocess.run(["make", "-C", str(makepath)])
 
 
 @cli.command()

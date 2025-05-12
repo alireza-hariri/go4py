@@ -57,7 +57,9 @@ Currently, we don't have good documentation, but you can check the [examples](ex
  - [x] no-GIL mode
  - [x] custom user bindings code
  - [x] make a helper function in go for passing Go slices to C
+ - [ ] documentation
  - [ ] Warn the user if it uses string or other dynamically allocated types as a result.
  - [ ] Warn the user for an unexported function or wrong export with space (`// export`).
  - [ ] Generate type definitions file (`.pyi` file).
  - [ ] Can we make async Python functions or not?
+ - [ ] read the pakage `.h` file to check if function name is found there.
