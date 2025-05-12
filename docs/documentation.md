@@ -1,53 +1,64 @@
-
 # Documentation
-This lib is a small code generator that make a python c-extention form a Go pakage with a some exported functions. The genereted code will make a wrapper for each exported function in to work as a method of the final python c-extention. the go pakage should be a cgo specificly and function's should be marked as `//exported`.
 
-### Why a library
-oh yes you can write this generated code yourself. specialy if the number of functions is limited. 
-But this library will simplify the process a lot and keeps the maximum flexibility in hand of user.
-more importantly you are dealing with C code and we are memory unsafe on objecs of both side. both on python objects and go objects.
+This library is a small code generator that creates a Python C-extension from a Go package with some exported functions. The generated code will create a wrapper for each exported function to work as a method of the final Python C-extension. The Go package should be a cgo package and functions should be marked as `//export`.
 
-## Getting stated 
+### Why a Library
+
+Yes, you can write this generated code yourself specially if the number of functions is limited.  
+But this library simplifies the process significantly and keeps maximum flexibility in the hands of the user.  
+More importantly, you are dealing with C code, and both Python and Go objects are memory-unsafe. It's good idea to generate unsafe codes insted of writing it by hand.
+
+## Getting Started
 
 ### 1. Installation
- Follow the instructions on the [readme page](/README.md).  
- and make soure to have these command availabe in your shell:
- 1. gcc & make
- 2. go4py
- 3. go
-### 2. The `go4py init` command
-The `go4py init <module_path>` command will create a directory in the `<module_path>` and it also create a `go.mod` file in the current directory (if it don't have any).
-so if you dont like the created `go.mod` in your root directory run this command from somewhere else.
 
-The full logic of this command can be found in the [cli.py](/go4py/cli.py#l40) file.
+Follow the instructions on the [README page](/README.md),  
+and make sure the following commands are available in your shell:
 
-### 2. The `go4py build` command
-The `go4py build [module_path]` command will look at the `[module_path]` for a `makefile` and run it (runs the default target). if there is not any makefile it will check the directories of the `[module_path]` (not recursive) for makefiles and run them all. the default value of `module_path` is current directory.
-after runing this makefile you are can import the ceated python module and use it's functions.
+1. `gcc` & `make`  
+2. `go4py`  
+3. `go`
+
+### 2. The `go4py init` Command
+
+The `go4py init <module_path>` command creates a directory at `<module_path>` and also generates a `go.mod` file in the current directory with `go mod init` command (if one doesn't already exist).  
+If you don't want a `go.mod` file in your current directory, run this command from somewhere else.
+
+The full logic of this command can be found in the [cli.py](/go4py/cli.py#L40) file.
+
+### 3. The `go4py build` Command
+
+The `go4py build [module_path]` command looks for a `Makefile` in `[module_path]` and runs it (the default target).  
+If no `Makefile` is found, it checks for `Makefile`s in the subdirectories of `[module_path]` (non-recursively) and runs them all. if `module_path` is not provided it will do the same thing for current directory.  
+After running the Makefile, you can import the created Python module and use its functions.
 
 The full logic of this command can be found in the [cli.py](/go4py/cli.py) file.
 
 ## Types
-There is some limitation with some go types. Most of these limitations is come from the fact that you are not allowed to simply return a normal pointer in cgo to the world outside of the go runtime. Similary you can't return types with normal go pointers inside them. but there is some workarownd (using unsafe pointers) and the go4py have some utils for this workarounds that we will explain later. 
 
-Some of solutions for python-go interoperability gets too smart and hide these limitations behind some complex tricks like tracking all the pointers in a map and passing the key insted of pointer to the outside of the go runtime. 
-We don't do that here! This simplify the liberary a lot, removes a layer of abstraction and makes the generated code much more readable. 
-you can simply do these kind of thing yourself. no need to complicate and hide things here.
+There are some limitations with Go types. Most of these come from the fact that you can't return normal pointers from cgo functions to outside of the Go runtime. Similarly, you can't return types containing Go pointers.  
 
-| Go type  | intermediate C type | Python type | notes|
-|----------|-------------|-------------|---------|
-| bool     | int         | bool        |-|
-| int8, int16, int32(rune), int64(int) | char, short, int, long| int|-|
-| float32, float64 | float, double | float|-|
-| string | char* | str | don't use this for return value see *note-1 |
-| *C.char | char* | str | use this type insted of `string` for returning strings to python|
-| []byte | PyObject* | bytes | see *note-1   |
-| slice (eg. []int)  |  PyObject* | list |will only worke for the above types, see *note-1 |
-#### **note-1** 
-These go types have a pointer inside them. so it can't be returned by a cgo functions to the outside of go runtime. (you use them as the function input without any problem)
+However, there are workarounds (using unsafe pointers), and `go4py` provides utilities for this, which we will explain later.
 
-for the `strings` the best solution is to use the `C.CString` from the go internal C pakage. That will convert your string to `*C.char`
+Some solutions for Python-Go interoperability try to get too clever, hiding these limitations behind complex tricks. for example tracking all pointers in a map and passing keys instead of actual pointers.  
+We don't do that here! This simplifies the library, removes a layer of abstraction, and makes the generated code is much more readable.  
+You can always handle that yourself if needed.
 
-for the `slice` type we have a helper function `go4py.copySlice()` that makes a copy of your slice but repaces the pointer inside with an unsafe pointer. make sure to use this function only when you are about to return the slice. if you use this function and forget to return the resulting slice then you will have a memory-leake for sure.
+| Go type                          | Intermediate C type | Python type | Notes |
+|----------------------------------|----------------------|--------------|-------|
+| `bool`                           | `int`                | `bool`       | -     |
+| `int8`, `int16`, `int32` (`rune`), `int64` (`int`) | `char`, `short`, `int`, `long` | `int` | - |
+| `float32`, `float64`             | `float`, `double`    | `float`      | -     |
+| `string`                         | `char*`              | `str`        | Don't use this as a return type; see *note-1* |
+| `*C.char`                        | `char*`              | `str`        | Use this instead of `string` for returning strings to Python |
+| `[]byte`                         | `PyObject*`          | `bytes`      | See *note-1* |
+| Slice (e.g. `[]int`)             | `PyObject*`          | `list`       | Works only for basic types; see *note-1* |
 
-#### **note-2** 
+#### **Note-1**
+
+These Go types contain internal pointers, so they cannot be returned by cgo functions to the outside world. (You can use them as function inputs without issue.)
+
+- For `string`, the best solution is to use `C.CString` from Go's internal C package. This converts a Go string into a `*C.char`.
+- For `slice`, use the helper function `go4py.CopySlice()` to create a copy of the slice with the pointer replaced by an unsafe pointer.  
+  Make sure to use this only when returning the slice. If you call this function and forget to return the resulting slice, it will cause a memory leak.
+### error
