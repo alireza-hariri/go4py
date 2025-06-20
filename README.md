@@ -4,7 +4,7 @@
 </div>
 
 Do you ever wish Python were faster? `go4py` is here to help!
-Enjoy the speed and simplicity of Go within Python! You just need to write bottlenecks of your Python code as some CGo functions. `go4py` will automatically generate the Python module for you!
+Enjoy the speed and simplicity of Go within Python! You can write bottlenecks of your Python code as CGo functions. The `go4py` will automatically generate a Python module from it for you!
 
 Check the performance boost in our [benchmarks](docs/benchmark.md) and get a sense of how much faster it can be compared to basic Python! 🚀
 
@@ -50,16 +50,16 @@ There is a Makefile in the created directory with four major steps:
 The Makefile is actually quite readable, and you can modify it to your needs `go4py` will just run it 
 
 ## Documentation
-Currently, we don't have good documentation, but you can check the [examples](examples) directory for some examples. And better than that, you can take a look at the [tests](tests) directory and see the codes that `go4py` generates.
+[This documentation](docs/documentation.md) will explain how to use go4py. there is also a [examples](examples) directory for some examples. But if you need to dive into inner-workings of `go4py` take a look at the [tests](tests) directory and checkout the codes that `go4py` generates automaticly from a go function signature.
 
 ### TODO
  - [x] Windows support
  - [x] no-GIL mode
  - [x] custom user bindings code
  - [x] make a helper function in go for passing Go slices to C
- - [ ] documentation
- - [ ] Warn the user if it uses string or other dynamically allocated types as a result.
- - [ ] Warn the user for an unexported function or wrong export with space (`// export`).
+ - [x] documentation
+ - [x] read the pakage `.h` file to check if function name is found there.
  - [ ] Generate type definitions file (`.pyi` file).
  - [ ] Can we make async Python functions or not?
- - [ ] read the pakage `.h` file to check if function name is found there.
+ - [ ] Warn the user if it uses string or other dynamically allocated types as a result.
+ - [ ] Warn the user for an unexported function or wrong export with space (`// export`).
