@@ -13,7 +13,7 @@ def make_doc_annots(doc: str) -> DocAnnots:
         if "[go4py]" in line:
             args = line.replace("[go4py]", "").strip().split()
             for arg in args:
-                if arg == "msgpack-decode":
+                if arg in "decode-msgpack":
                     doc_annots.msgpack_decode = True
                 elif arg == "no-gil":
                     doc_annots.no_gil = True
@@ -25,7 +25,7 @@ def make_doc_annots(doc: str) -> DocAnnots:
 
 
 def test_make_doc_annots():
-    doc = "[go4py]   msgpack-decode\n"
+    doc = "[go4py]   decode-msgpack\n"
     doc_annots = make_doc_annots(doc)
     assert doc_annots.msgpack_decode
 

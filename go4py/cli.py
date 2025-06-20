@@ -55,7 +55,7 @@ def init(module_name):
         # initialize a go module in root directory
         os.system(f"go mod init {module_name}")
     else:
-        click.echo("Already inside a Go module, skipping 'go mod init'")
+        click.echo("\nAlready inside a Go module, skipping 'go mod init' command")
 
     # for all files in template folder copy them to the module folder
     data = {"module_name": module_name.split("/")[-1]}
@@ -66,7 +66,7 @@ def init(module_name):
             dst_file.write_text(render_template(file.read_text(), data))
 
     # print a message
-    click.echo(f"Module {module_name} initialized.")
+    print_text_box(f"Module {module_name} initialized.")
 
 
 @cli.command()

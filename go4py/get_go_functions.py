@@ -9,11 +9,24 @@ from go4py.types import GoFunction
 logger = logging.getLogger(__name__)
 
 
-def get_go_functions(module_folder: str):
+def extract_functions_from_dot_h(file_path):
+    with open(file_path, 'r') as f:
+        content = f.readlines()
+    fn_names = set()
+    for line in content:
+        if line.startswith("extern"):
+            if line.endswith(");"):
+                fn_names.add(line.split(" ")[2].split("(")[0])
+                
+
+
+def get_go_functions(module_name: str):
     """list all go exported functions in the go module"""
 
     # Path to the generated functions.json file
     functions_json_path = Path("artifacts/functions.json")
+    header_file = Path(f"artifacts/build/lib{module_name}.h")
+    fn_names = extract_functions_from_dot_h(header_file)
 
     # Check if the functions.json file was generated
     if not functions_json_path.exists():
@@ -25,12 +38,18 @@ def get_go_functions(module_folder: str):
     with open(functions_json_path, "r") as f:
         functions_data = json.load(f)
 
+    with open(functions_json_path, "r") as f:
+        functions_data = json.load(f)
+
     # Generate GoFunction objects from the JSON data
     go_functions = []
     for func_data in functions_data:
         try:
             go_function = GoFunction.model_validate(func_data)
-            go_functions.append(go_function)
+            if go_function.name not in fn_names:
+                logger.warning(f'function skipped: `{go_function.name}` is not in the header file. ({header_file})')
+            else:
+                go_functions.append(go_function)
             # print(f"Parsed function: {go_function.name}")
         except Exception as e:
             logger.warning(

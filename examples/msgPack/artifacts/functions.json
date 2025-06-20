@@ -1,0 +1,30 @@
+[
+  {
+    "package": "main",
+    "name": "Example_fn1",
+    "docs": "[go4py] decode-msgpack\n",
+    "arguments": [],
+    "return_type": [
+      {
+        "go_type": "[]byte"
+      },
+      {
+        "go_type": "*C.char"
+      }
+    ]
+  },
+  {
+    "package": "main",
+    "name": "Example_fn2",
+    "docs": "",
+    "arguments": [],
+    "return_type": [
+      {
+        "go_type": "[]byte"
+      },
+      {
+        "go_type": "*C.char"
+      }
+    ]
+  }
+]

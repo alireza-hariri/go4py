@@ -26,8 +26,9 @@ def read_config():
 if __name__ == "__main__":
     args = parse_args()
     module_path = args.module_path
-    functions = get_go_functions(module_path)
     module_name = module_path.split("/")[-1]
+
+    functions = get_go_functions(module_name)
 
     config = go4pyConfig.model_validate(read_config())
     config.module_name = module_name

@@ -6,7 +6,7 @@ test_cases = {}
 
 fn = GoFunction(
     name="Func_12",
-    docs="[go4py] msgpack-decode\n",
+    docs="[go4py] decode-msgpack\n",
     arguments=[],
     return_type=[{"go_type": "[]byte"}, {"go_type": "*C.char"}],
 )
