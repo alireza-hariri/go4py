@@ -16,7 +16,7 @@
   {
     "package": "main",
     "name": "Example_fn2",
-    "docs": "",
+    "docs": "[go4py] decode-msgpack\n",
     "arguments": [],
     "return_type": [
       {

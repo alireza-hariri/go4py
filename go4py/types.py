@@ -69,6 +69,8 @@ class VarType(BaseModel, ABC):
     def cgo_type(self) -> str:
         return self.c_type()
 
+    @abstractmethod
+    def py_type_hint(self): ...
 
 class IntType(VarType):
     go_type: Literal[
@@ -157,7 +159,9 @@ class IntType(VarType):
 
     def check(self, inp):
         return f"PyLong_Check({inp})"
-
+    
+    def py_type_hint(self):
+        return "int"
 
 class FloatType(VarType):
     go_type: Literal["float64", "float32"] = "float64"
@@ -206,6 +210,8 @@ class FloatType(VarType):
     def check(self, inp):
         return f"PyFloat_Check({inp})"
 
+    def py_type_hint(self): 
+        return "float"
 
 class BoolType(VarType):
     go_type: Literal["bool"] = "bool"
@@ -226,6 +232,8 @@ class BoolType(VarType):
     def check(self, inp):
         return None  # skip checking for bool
 
+    def py_type_hint(self): 
+        return "bool"
 
 class CStringType(VarType):
     go_type: Literal["*C.char"] = "*C.char"
@@ -249,6 +257,8 @@ class CStringType(VarType):
     def need_free(self):
         return True
 
+    def py_type_hint(self): 
+        return "str"
 
 class GoStringType(VarType):
     go_type: Literal["string"] = "string"
@@ -275,6 +285,8 @@ class GoStringType(VarType):
     def cgo_type(self):
         return "GoString"
 
+    def py_type_hint(self): 
+        return "str"
 
 class ByteSliceType(VarType):
     go_type: Literal["[]byte"] = "[]byte"
@@ -302,6 +314,8 @@ class ByteSliceType(VarType):
     def cgo_type(self):
         return "GoSlice"
 
+    def py_type_hint(self): 
+        return "bytes"
 
 class UnknownType(VarType):
     go_type: str
@@ -329,7 +343,8 @@ class UnknownType(VarType):
             return SliceType(item_type={"go_type": t})
         else:
             raise CgoLimitationError(f"please check if you can use type: {self.go_type}")
-
+    
+    def py_type_hint(self): ...
 
 SimpleTypes: TypeAlias = (
     IntType
@@ -338,7 +353,7 @@ SimpleTypes: TypeAlias = (
     | GoStringType
     | CStringType
     | ByteSliceType
-    | UnknownType  # Complex Types will fall into this but will be resolved later
+    | UnknownType  # Complex Types like slice will fall into this but will be resolved later
 )
 
 
@@ -367,7 +382,9 @@ class SliceType(VarType):
 
     def cgo_type(self) -> str:
         return "GoSlice"
-
+    
+    def py_type_hint(self): 
+        return f"list[{self.item_type.py_type_hint()}]"
 
 RealType: TypeAlias = SimpleTypes | SliceType
 

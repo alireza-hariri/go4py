@@ -36,12 +36,19 @@ static PyObject* msgPack_example_fn1(PyObject* self, PyObject* args) {
 
 static PyObject* msgPack_example_fn2(PyObject* self, PyObject* args) { 
     struct Example_fn2_return result = Example_fn2();
-    PyObject* py_result_r0 = result.r0.data==NULL ? GetPyNone() : PyBytes_FromStringAndSize(result.r0.data, result.r0.len);
+    PyObject* py_result_r0_msgpack;
+    if (result.r0.data!=NULL){
+        PyObject* py_result_r0 = PyBytes_FromStringAndSize(result.r0.data, result.r0.len);
+        py_result_r0_msgpack = PyObject_CallFunctionObjArgs(unpackb, py_result_r0, NULL);
+        Py_DECREF(py_result_r0);
+    }else{
+        py_result_r0_msgpack = GetPyNone();
+    }
     free(result.r0.data);
     PyObject* py_result_r1 = result.r1==NULL ? GetPyNone() : PyUnicode_FromString(result.r1);
     free(result.r1);
-    PyObject* py_result = Py_BuildValue("OO", py_result_r0, py_result_r1);
-    Py_DECREF(py_result_r0);
+    PyObject* py_result = Py_BuildValue("OO", py_result_r0_msgpack, py_result_r1);
+    Py_DECREF(py_result_r0_msgpack);
     Py_DECREF(py_result_r1);
     return py_result;
 }

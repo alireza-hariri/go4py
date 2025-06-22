@@ -1,35 +1,42 @@
-# This makefile have 4 steps:
-#
-# 1. Parsing Go code (extracting function signatures)
-# 2. Building Go code into c-archive (.a file)
-# 3. Generating Python wrapper code ()
-# 4. Compiling everything into a shared library
+.PHONY: clean cpython-extention
 
 
-.PHONY: clean go4py-wrapper c-build
+# --- Platform-specific ---
+# The file extention of a c-extention pakage is ".so" in linux and ".pyd" in windows
+ifeq (,$(findstring NT,$(OS))) 
+    # on Linux
+    SHARED_LIB_EXT := .so
+else
+    # on Windows
+    SHARED_LIB_EXT := .pyd 
+endif
 
-# Configuration variables
+
+# -- Variables ---
 MODULE_NAME := go_cool
 BUILD_DIR := ./artifacts/build
-ARTIFACTS_DIR := ./artifacts
-
-GO_TARGET := ${BUILD_DIR}/lib${MODULE_NAME}.a
-PARSER_TARGET := ${ARTIFACTS_DIR}/functions.json
-OUTPUT_FILE := __init__.so
-
-PYTHON_INCLUDE=/usr/include/python3.13
-export PYTHONPATH=..
-
-CFLAGS := -shared -fPIC
-LDFLAGS := -L${BUILD_DIR} -l${MODULE_NAME}
+PYTHON_INCLUDE=$(shell go4py py-include-path)
+PYTHON3_LIB=$(shell go4py py-lib-path)
 GO_FILES := $(shell find . -name "*.go")
 
-# Default target
-all:  c-build
 
+# --- Targets ---
+ARTIFACTS_DIR := ./artifacts
+PARSER_TARGET := ${ARTIFACTS_DIR}/functions.json
+GO_TARGET := ${BUILD_DIR}/lib${MODULE_NAME}.a
+FINAL_TARGET := __init__${SHARED_LIB_EXT} # eg. __init__.so
+
+
+# --- Build Flags ---
+CFLAGS := -shared -fPIC -I${PYTHON_INCLUDE}
+LDFLAGS := -L${BUILD_DIR} -l${MODULE_NAME} -L${PYTHON3_LIB} -lpython3
+
+
+# --- Rules ---
+all:  ${FINAL_TARGET}
 
 ${ARTIFACTS_DIR}:
-	@mkdir -p ${ARTIFACTS_DIR}
+	mkdir -p ${ARTIFACTS_DIR}
 
 # 1. Parsing Go codes
 ${PARSER_TARGET}: ${GO_FILES} ${ARTIFACTS_DIR}
@@ -37,21 +44,21 @@ ${PARSER_TARGET}: ${GO_FILES} ${ARTIFACTS_DIR}
 	go4py parse ./src
 
 # 2. Build Go files
-${GO_TARGET}: ${GO_FILES} ${PARSER_TARGET}
+${GO_TARGET}: ${PARSER_TARGET}
 	@go4py textbox Step-2: "Building Go code"
-	go build -buildmode=c-archive -o ${BUILD_DIR}/lib${MODULE_NAME}.a ./src
+	go build -buildmode=c-archive -o ${GO_TARGET} ./src
 
 # 3. Generate Python wrapper code
-go4py-wrapper: ${PARSER_TARGET} ${GO_TARGET}
-	@go4py textbox Step-3: "Generating CPython binding code"
+cpython-extention: ${PARSER_TARGET} ${GO_TARGET}
+	@go4py textbox Step-3: "Generating CPython wrapper code"
 	python -m go4py.code_gen ${MODULE_NAME}
 
 # 4. Build final shared library
-c-build: ${GO_TARGET} go4py-wrapper
+${FINAL_TARGET}: cpython-extention
 	@go4py textbox Step-4: "Building final shared library"
-	gcc ${CFLAGS} -o ${OUTPUT_FILE} $(wildcard cpython-extention/*.c) ${LDFLAGS} -I${PYTHON_INCLUDE}
+	gcc ${CFLAGS} -o ${FINAL_TARGET} $(wildcard cpython-extention/*.c) ${LDFLAGS}
 	@go4py textbox Done!
 
 # Clean build artifacts
 clean:
-	rm -rf ${BUILD_DIR} ./*.so
+	rm -rf ${BUILD_DIR} ./*${SHARED_LIB_EXT}

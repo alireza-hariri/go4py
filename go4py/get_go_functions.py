@@ -1,5 +1,7 @@
+from io import StringIO
 import json
 import os
+import pdb
 import subprocess
 from pathlib import Path
 import logging
@@ -9,15 +11,15 @@ from go4py.types import GoFunction
 logger = logging.getLogger(__name__)
 
 
-def extract_functions_from_dot_h(file_path):
-    with open(file_path, 'r') as f:
-        content = f.readlines()
+def extract_functions_from_dot_h(file:StringIO):
+    content = file.readlines()
     fn_names = set()
     for line in content:
+        line = line.strip()
         if line.startswith("extern"):
             if line.endswith(");"):
-                fn_names.add(line.split(" ")[2].split("(")[0])
-                
+                fn_names.add(line.split("(")[0].split(" ")[-1])
+    return fn_names
 
 
 def get_go_functions(module_name: str):
@@ -26,7 +28,9 @@ def get_go_functions(module_name: str):
     # Path to the generated functions.json file
     functions_json_path = Path("artifacts/functions.json")
     header_file = Path(f"artifacts/build/lib{module_name}.h")
-    fn_names = extract_functions_from_dot_h(header_file)
+    
+    with open(header_file, 'r') as file:
+        fn_names = extract_functions_from_dot_h(file)
 
     # Check if the functions.json file was generated
     if not functions_json_path.exists():
@@ -50,12 +54,14 @@ def get_go_functions(module_name: str):
                 logger.warning(f'function skipped: `{go_function.name}` is not in the header file. ({header_file})')
             else:
                 go_functions.append(go_function)
+
             # print(f"Parsed function: {go_function.name}")
         except Exception as e:
             logger.warning(
                 f"function skipped: {func_data['name']} (set log-level to DEBUG for more info)"
             )
             logger.debug(f"Error: {e}")
+            # pdb.post_mortem()
 
     logger.info(f"Successfully parsed {len(go_functions)} functions")
 
