@@ -52,15 +52,3 @@ The Makefile is actually quite readable, and you can modify it to your needs `go
 ## Documentation
 [This documentation](docs/documentation.md) will explain how to use go4py. there is also a [examples](examples) directory for some examples. But if you need to dive into inner-workings of `go4py` take a look at the [tests](tests) directory and checkout the codes that `go4py` generates automaticly from a go function signature.
 
-### TODO
- - [x] Windows support
- - [x] no-GIL mode
- - [x] custom user bindings code
- - [x] make a helper function in go for passing Go slices to C
- - [x] documentation
- - [x] read the pakage `.h` file to check if function name is found there.
- - [ ] Generate type definitions file (`.pyi` file).
- - [ ] Can we make async Python functions or not?
- - [ ] Warn the user if it uses string or other dynamically allocated types as a result.
- - [ ] Warn the user for an unexported function or wrong export with space (`// export`).
-

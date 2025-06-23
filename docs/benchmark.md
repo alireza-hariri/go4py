@@ -1,6 +1,6 @@
 # Benchmarks
 
-This document presents benchmark results comparing the performance of Go4Py against standard Python implementations for some tasks. you can find the codes in the [examples](/examples/benchmarks/) dirctory. The "speedup" indicates how much faster Go4Py is compared to the corresponding Python implementation. A value greater than 1x means Go4Py is faster, while a value less than 1x means Go4Py is slower.
+This document presents benchmark results comparing the performance of Go4Py against standard Python implementations for some selected tasks. you can find the codes in the [examples](/examples/benchmarks/) dirctory. The "speedup" indicates how much faster Go4Py is compared to the corresponding Python implementation. A value greater than 1x means Go4Py is faster, while a value less than 1x means Go4Py is slower.
 
 *   These benchmarks are specific to the environment and versions used during testing. Results may vary depending on hardware and software configuration.
 *   `n` represents an input parameter to the Python function.
@@ -81,12 +81,12 @@ This document presents benchmark results comparing the performance of Go4Py agai
  * we use joblib to parallelize the MD5 hash calculation on python side and we use native go-routine on go side.
  * we do a search in the python side to find the best n_jobs for each input size.
  * when there is enough inputs the overhead of python parallelization become less significant and the speedup will be closer to the speedup of single file.
- * the speedup is some what consistent for different file sizes.
+ * This speedup is some what consistent for different file sizes.
 ## Conclusions
 
 * Go4Py demonstrates significant speedups in non-trival tasks like `Fibonacci` and `FindPrimes`. The speedup tends to increase with the input size `n`.
 
-* Trival tasks like `Add` shows a slowdown. This is likely due to the overhead in the function boundry. But this can be acceptable for many use cases. because this overhead is as low as 50ns.
+* Trival tasks like `Add` shows a slowdown. This is likely due to the overhead in the function boundry. But this overhead can be acceptable for many use cases. because its as low as 50ns.
 
 * The `getRequest` benchmark shows a significant speedup, indicating that Go4Py can efficiently handle network requests, even without any concurrency.
 

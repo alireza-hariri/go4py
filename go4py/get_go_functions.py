@@ -60,6 +60,9 @@ def get_go_functions(module_name: str) :
             go_function = GoFunction.model_validate(func_data)
             if go_function.name not in fn_names:
                 logger.warning(f'function skipped: `{go_function.name}` is not in the header file. ({header_file})')
+                for line in go_function.docs.splitlines():
+                    if line.startswith("export"):
+                        logger.warning("WARNING: Use of '// export' insted of '//export' !!")
             else:
                 resolve_unknowns(go_function)
                 go_functions.append(go_function)

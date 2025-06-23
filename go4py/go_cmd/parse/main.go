@@ -149,9 +149,12 @@ func main() {
 								// }
 							}
 						}
-
 						// Add the function to our list
 						functions = append(functions, goFunc)
+					}else{
+						if (fn.Name.Name != "main"){
+							fmt.Fprintf(os.Stdout, "INFO: Lowercase function " + fn.Name.Name + "\n")
+						}
 					}
 				}
 				decl, ok := decl.(*ast.GenDecl)
