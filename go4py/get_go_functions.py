@@ -5,8 +5,8 @@ import pdb
 import subprocess
 from pathlib import Path
 import logging
-from go4py.types import GoFunction
-
+from go4py.types import GoFunction, UnknownType
+import IPython
 
 logger = logging.getLogger(__name__)
 
@@ -22,7 +22,15 @@ def extract_functions_from_dot_h(file:StringIO):
     return fn_names
 
 
-def get_go_functions(module_name: str):
+def resolve_unknowns(fn:GoFunction):
+    for i, t in enumerate(fn.return_type):
+        if type(t) is UnknownType:
+            fn.return_type[i] = t.resolve()
+    for arg in fn.arguments:
+        if type(arg.type) is UnknownType:
+            arg.type = arg.type.resolve()
+
+def get_go_functions(module_name: str) :
     """list all go exported functions in the go module"""
 
     # Path to the generated functions.json file
@@ -53,6 +61,7 @@ def get_go_functions(module_name: str):
             if go_function.name not in fn_names:
                 logger.warning(f'function skipped: `{go_function.name}` is not in the header file. ({header_file})')
             else:
+                resolve_unknowns(go_function)
                 go_functions.append(go_function)
 
             # print(f"Parsed function: {go_function.name}")
@@ -60,10 +69,31 @@ def get_go_functions(module_name: str):
             logger.warning(
                 f"function skipped: {func_data['name']} (set log-level to DEBUG for more info)"
             )
-            logger.debug(f"Error: {e}")
+            logger.debug(e.__traceback__)
             # pdb.post_mortem()
 
-    logger.info(f"Successfully parsed {len(go_functions)} functions")
 
-    # Return the list of GoFunction objects for further processing
+
     return go_functions
+
+
+
+
+def convert_functions(go_functions:list[GoFunction]):
+    result = {"functions":[]}
+    for fn in go_functions:
+        result["functions"].append({
+            "name":fn.name,
+            "arguments": [
+                {
+                    "name": arg.name,
+                    "type": arg.type.py_type_hint()
+                }
+                for arg in fn.arguments
+            ],
+            "return_types": [
+                t.py_type_hint()
+                for t in fn.return_type
+            ]
+        })
+    return result

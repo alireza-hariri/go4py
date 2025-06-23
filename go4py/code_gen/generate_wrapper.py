@@ -174,9 +174,7 @@ def gen_return_code(fn: GoFunction, doc_annots: DocAnnots) -> str:
 
     code = ""
 
-    for i, t in enumerate(return_types):
-        if type(t) is UnknownType:
-            return_types[i] = t.resolve()
+
     if len(return_types) == 0:
         code += "\n    RETURN_NONE;"
     else:
@@ -223,8 +221,6 @@ def gen_fn(fn: GoFunction, module_name: str) -> str:
 
     arg_parser = ArgumentParser()
     for arg in fn.arguments:
-        if type(arg.type) is UnknownType:
-            arg.type = arg.type.resolve()
         arg_parser.addArg(arg)
     return_code = gen_return_code(fn, doc_annots)
 

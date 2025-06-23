@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from go4py.code_gen.file_gen import gen_binding_file
+from go4py.code_gen.gen_pyi import gen_pyi_file
 from go4py.get_go_functions import get_go_functions
 import argparse
 import os
@@ -29,6 +30,8 @@ if __name__ == "__main__":
     module_name = module_path.split("/")[-1]
 
     functions = get_go_functions(module_name)
+    gen_pyi_file(functions, "__init__.pyi")
+
 
     config = go4pyConfig.model_validate(read_config())
     config.module_name = module_name
