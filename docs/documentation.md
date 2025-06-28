@@ -6,7 +6,7 @@ This library is a small code generator that creates a Python C-extension from a 
 
 Yes, you can write this generated code yourself specially if the number of functions is limited.  
 But this library simplifies the process significantly and keeps maximum flexibility in the hands of the user.  
-More importantly, you are dealing with C code, and both Python and Go objects are memory-unsafe. It's good idea to generate unsafe codes instead of writing it by hand.
+More importantly, you are dealing with C code, and both Python and Go objects are memory-unsafe there. It's always good idea to generate unsafe codes instead of writing it by hand.
 
 ## Getting Started
 
