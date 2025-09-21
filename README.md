@@ -12,7 +12,7 @@ Check the performance boost in our [benchmarks](docs/benchmark.md) and get a sen
 ## Installation
 #### Linux
  1. Install Go
- 2. `pip install go4py` / `uv tool install go4py`
+ 2. `pip install go4py` OR `uv tool install go4py`
 #### Windows
  1. Install Go
  2. Install [MSYS2](https://www.msys2.org/) and then install [mingw-toolchain](https://packages.msys2.org/groups/mingw-w64-x86_64-toolchain) inside it.
